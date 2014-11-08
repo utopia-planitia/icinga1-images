@@ -23,7 +23,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get -qqy --no-install-recommends install apache2
 
 # Install icinga
-RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins
+RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
 
 # Clean up some.
 RUN apt-get clean
