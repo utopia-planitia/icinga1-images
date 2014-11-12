@@ -22,7 +22,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # When depencencies are pulled in by icinga, they seem to be configured too late and configuration
 # of icinga fails. To work around this, install dependencies beforehand.
-RUN apt-get -qqy --no-install-recommends install apache2 postfix
+RUN apt-get -qqy --no-install-recommends install apache2 postfix dnsutils
 
 # Install icinga
 RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
