@@ -34,7 +34,7 @@ ADD postfix.sh /postfix.sh
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod u+x /postfix.sh /entrypoint.sh
 
-VOLUME  ["/etc/icinga"]
+VOLUME  ["/etc/icinga" "/var/cache/icinga"]
 
 # Initialize and run Supervisor
 ENTRYPOINT ["/entrypoint.sh"]
