@@ -1,6 +1,8 @@
 # About This Image
 
 1. Based on ubuntu:trusty
+1. Contains Postfix to be able to send emails.
+1. Contains rsyslogd to be able to read postfix's log entries.
 1. No SSH. If you need to execute commands in the context of the container, you can use [nsenter](https://github.com/jpetazzo/nsenter).
 1. No database. IDO is not configured.
 
@@ -14,10 +16,13 @@ docker run -dt jeyk/icinga
 
 # Volumes
 
-This container exposes one volume that contains all configurations files for icinga.
+This container exposes these volumes:
 
 ```
-/etc/icinga
+/etc/icinga       --> Icinga configuration files
+/var/cache/icinga --> Icinga state retention and cache files
+/etc/postfix      --> Postfix configuration
+/var/log          --> Log files.
 ```
 
 # Setting passwords
