@@ -2,9 +2,8 @@
 set -e 
 
 gpasswd -a www-data nagios
-mkdir -p /var/run/icinga/cmd
-chown -R nagios:nagios /var/run/icinga
-chown -R nagios:www-data /var/run/icinga/cmd
+rm -rf /var/lib/icinga/rw
+mkdir -p /var/lib/icinga/rw
 chown -R nagios:www-data /var/lib/icinga/rw
-chmod g+rws /var/lib/icinga/rw
+chmod g+rwxs /var/lib/icinga/rw
 exec "$@"
