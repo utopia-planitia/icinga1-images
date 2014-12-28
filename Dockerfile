@@ -1,5 +1,5 @@
-# Dockerfile for icinga2, icinga-web and icinga2-classicui
-FROM ubuntu:latest
+# Dockerfile for icinga
+FROM jeyk/ubuntu
 
 MAINTAINER Joachim Breitsprecher
 
