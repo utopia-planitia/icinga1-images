@@ -1,58 +1,62 @@
-FROM cpuguy83/ubuntu
-ENV NAGIOS_HOME /opt/nagios
-ENV NAGIOS_USER nagios
-ENV NAGIOS_GROUP nagios
-ENV NAGIOS_CMDUSER nagios
-ENV NAGIOS_CMDGROUP nagios
-ENV NAGIOSADMIN_USER nagiosadmin
-ENV NAGIOSADMIN_PASS nagios
-ENV APACHE_RUN_USER nagios
-ENV APACHE_RUN_GROUP nagios
-ENV NAGIOS_TIMEZONE UTC
+FROM ubuntu:14.04
+
+# apt config
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN sed -i 's/universe/universe multiverse/' /etc/apt/sources.list
-RUN apt-get update && apt-get install -y iputils-ping netcat build-essential snmp snmpd snmp-mibs-downloader php5-cli apache2 libapache2-mod-php5 runit bc postfix bsd-mailx libssl-dev libgd2-xpm-dev libpng-dev libjpeg-dev zlib1g-dev
-RUN ( egrep -i  "^${NAGIOS_GROUP}" /etc/group || groupadd $NAGIOS_GROUP ) && ( egrep -i "^${NAGIOS_CMDGROUP}" /etc/group || groupadd $NAGIOS_CMDGROUP )
-RUN ( id -u $NAGIOS_USER || useradd --system $NAGIOS_USER -g $NAGIOS_GROUP -d $NAGIOS_HOME ) && ( id -u $NAGIOS_CMDUSER || useradd --system -d $NAGIOS_HOME -g $NAGIOS_CMDGROUP $NAGIOS_CMDUSER )
 
-ADD http://downloads.sourceforge.net/project/nagios/nagios-3.x/nagios-3.5.1/nagios-3.5.1.tar.gz?r=http%3A%2F%2Fwww.nagios.org%2Fdownload%2Fcore%2Fthanks%2F%3Ft%3D1398863696&ts=1398863718&use_mirror=superb-dca3 /tmp/nagios.tar.gz
-RUN cd /tmp && tar -zxvf nagios.tar.gz && cd nagios  && ./configure --prefix=${NAGIOS_HOME} --exec-prefix=${NAGIOS_HOME} --enable-event-broker --with-nagios-command-user=${NAGIOS_CMDUSER} --with-command-group=${NAGIOS_CMDGROUP} --with-nagios-user=${NAGIOS_USER} --with-nagios-group=${NAGIOS_GROUP} && make all && make install && make install-config && make install-commandmode && cp sample-config/httpd.conf /etc/apache2/conf.d/nagios.conf
-ADD http://www.nagios-plugins.org/download/nagios-plugins-1.5.tar.gz /tmp/
-RUN cd /tmp && tar -zxvf nagios-plugins-1.5.tar.gz && cd nagios-plugins-1.5 && ./configure --prefix=${NAGIOS_HOME} --with-openssl && make && make install
+# cassandra source
+COPY apache-cassandra.list /etc/apt/sources.list.d/apache-cassandra.list
+RUN gpg --keyserver pgp.mit.edu --recv-keys F758CE318D77295D && gpg --export --armor F758CE318D77295D | apt-key add -
+RUN gpg --keyserver pgp.mit.edu --recv-keys 2B5C1B00 && gpg --export --armor 2B5C1B00 | apt-key add -
+RUN gpg --keyserver pgp.mit.edu --recv-keys 0353B12C && gpg --export --armor 0353B12C | apt-key add -
 
+# update system
+RUN apt-get update
+RUN apt-get upgrade -y
+
+# install nagios
+RUN apt-get install -y nagios3 nagios-nrpe-plugin runit
+
+# set apache path
 RUN sed -i.bak 's/.*\=www\-data//g' /etc/apache2/envvars
-RUN export DOC_ROOT="DocumentRoot $(echo $NAGIOS_HOME/share)"; sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/000-default
+RUN export DOC_ROOT="DocumentRoot /usr/share/nagios3/htdocs"; sed -i "s,DocumentRoot.*,$DOC_ROOT," /etc/apache2/sites-enabled/000-default.conf
 
-RUN ln -s ${NAGIOS_HOME}/bin/nagios /usr/local/bin/nagios && mkdir -p /usr/share/snmp/mibs && chmod 0755 /usr/share/snmp/mibs && touch /usr/share/snmp/mibs/.foo
+# cassandra check
+# from http://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3072&cf_id=24
+ADD cass_unreachable_nodes /usr/lib/nagios/plugins/cass_unreachable_nodes
+RUN apt-get install -y cassandra-tools
 
-RUN echo "use_timezone=$NAGIOS_TIMEZONE" >> ${NAGIOS_HOME}/etc/nagios.cfg && echo "SetEnv TZ \"${NAGIOS_TIMEZONE}\"" >> /etc/apache2/conf.d/nagios.conf
+# memcache check
+# from http://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3609&cf_id=24 
+ADD check_memcached.pl /usr/lib/nagios/plugins/check_memcached.pl
+RUN apt-get install -y libcache-memcached-perl
 
-RUN mkdir -p ${NAGIOS_HOME}/etc/conf.d && mkdir -p ${NAGIOS_HOME}/etc/monitor && ln -s /usr/share/snmp/mibs ${NAGIOS_HOME}/libexec/mibs
-RUN echo "cfg_dir=${NAGIOS_HOME}/etc/conf.d" >> ${NAGIOS_HOME}/etc/nagios.cfg
-RUN echo "cfg_dir=${NAGIOS_HOME}/etc/monitor" >> ${NAGIOS_HOME}/etc/nagios.cfg
-RUN download-mibs && echo "mibs +ALL" > /etc/snmp/snmp.conf
+# zookeeper check
+# from https://raw.githubusercontent.com/harisekhon/nagios-plugins/master/check_zookeeper.pl 
+ADD check_zookeeper.pl /usr/lib/nagios/plugins/check_zookeeper.pl
 
-RUN sed -i 's,/bin/mail,/usr/bin/mail,' /opt/nagios/etc/objects/commands.cfg && \
-  sed -i 's,/usr/usr,/usr,' /opt/nagios/etc/objects/commands.cfg
-RUN cp /etc/services /var/spool/postfix/etc/
-
+# startup
 RUN mkdir -p /etc/sv/nagios && mkdir -p /etc/sv/apache && rm -rf /etc/sv/getty-5 && mkdir -p /etc/sv/postfix
 ADD nagios.init /etc/sv/nagios/run
 ADD apache.init /etc/sv/apache/run
 ADD postfix.init /etc/sv/postfix/run
 ADD postfix.stop /etc/sv/postfix/finish
 
-ADD start.sh /usr/local/bin/start_nagios
+# control access
+COPY htpasswd.users /etc/nagios3/htpasswd.users
+RUN cd /usr/share/nagios3/htdocs/ && ln -s /etc/nagios3/stylesheets/ .
 
 ENV APACHE_LOCK_DIR /var/run
 ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_PID_FILE apache.pid
+ENV APACHE_RUN_USER nagios
+ENV APACHE_RUN_GROUP nagios
 
 EXPOSE 80
 
-VOLUME /opt/nagios/var
-VOLUME /opt/nagios/etc
-VOLUME /opt/nagios/libexec
-VOLUME /var/log/apache2
-VOLUME /usr/share/snmp/mibs
+VOLUME /var/lib/nagios3/
+VOLUME /etc/nagios3/conf.d/
 
+ADD start.sh /usr/local/bin/start_nagios
 CMD ["/usr/local/bin/start_nagios"]
