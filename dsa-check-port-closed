@@ -1,0 +1,15 @@
+#!/bin/bash
+
+/usr/lib/nagios/plugins/check_tcp "$@" > /dev/null
+rc="$?"
+
+if [ "$rc" -eq 0 ]; then
+	echo "Warning: port is open"
+	exit 1
+elif [ "$rc" -eq 2 ]; then
+	echo "OK: port is closed"
+	exit 0
+else
+	echo "Unknown exit code from check_tcp"
+	exit 3
+fi
