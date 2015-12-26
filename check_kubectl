@@ -14,6 +14,39 @@ REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
 
 #####################################################################
 
+#Function to print Usage
+function usage
+{
+echo "Usage: $0 -N [minimum number of nodes]"
+exit $STATE_UNKNOWN
+}
+
+
+MINIMUM_NODE_COUNT=1
+#####################################################################
+# get parameter values in Variables
+
+while test -n "$1"; do
+    case "$1" in
+         -h)
+            usage
+            ;;
+         -N)
+            MINIMUM_NODE_COUNT=$2
+            shift
+            ;;
+         *)
+            echo "Unknown argument: $1"
+            usage
+            ;;
+    esac
+    shift
+done
+
+#####################################################################
+
+
+
 STATUS=$( kubectl get cs )
 
 if [ "$STATUS" == "" ]; then
@@ -24,10 +57,16 @@ fi
 ETCD_HEALTH=$(       echo "$STATUS" | grep etcd               | awk -F ' ' '{print $2}' )
 SCHEDULER_HEALTH=$(  echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
 CONTROLLER_HEALTH=$( echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
-
 if [ "$ETCD_HEALTH" == "Unhealthy" ] || [ "$SCHEDULER_HEALTH" == "Unhealthy" ] || [ "$CONTROLLER_HEALTH" == "Unhealthy" ]
 then
 	echo "[CRIT] etcd $ETCD_HEALTH, scheduler $SCHEDULER_HEALTH, controller-manager $CONTROLLER_HEALTH"
+	exit $STATE_CRITICAL
+fi
+
+NODES=$( kubectl get no | tail -n +2 | grep Ready | wc -l )
+if [ "$NODES" -lt "$MINIMUM_NODE_COUNT" ]
+then
+	echo "[CRIT] only $NODES nodes Ready, $MINIMUM_NODE_COUNT desired"
 	exit $STATE_CRITICAL
 fi
 
