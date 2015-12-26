@@ -18,7 +18,7 @@ tag-master:
   only:
     - master
   script:
-    - docker pull $BASE_IMAGE:$CI_BUILD_REF .
+    - docker pull $BASE_IMAGE:$CI_BUILD_REF
     - docker tag $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:latest
     - docker push $BASE_IMAGE:latest
 
@@ -27,7 +27,7 @@ tag-branch:
   except:
     - master
   script:
-    - docker pull $BASE_IMAGE:$CI_BUILD_REF .
+    - docker pull $BASE_IMAGE:$CI_BUILD_REF
     - docker tag $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$CI_BUILD_REF_NAME
     - docker push $BASE_IMAGE:$CU_BUILD_REF_NAME
 
