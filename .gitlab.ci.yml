@@ -1,0 +1,45 @@
+variables:
+  BASE_IMAGE: registry.suchgenie.de/nagios
+
+stages:
+  - build
+  - tag
+  - configure
+
+build-image:
+  stage: build
+  script:
+    - docker build --pull=true -t $BASE_IMAGE:$CI_BUILD_REF .
+    - docker push $BASE_IMAGE:$CI_BUILD_REF
+
+tag-master:
+  stage: tag
+  only:
+    - master
+  script:
+    - docker pull $BASE_IMAGE:$CI_BUILD_REF .
+    - docker tag $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:latest
+    - docker push $BASE_IMAGE:latest
+
+tag-branch:
+  stage: tag
+  except:
+    - master
+  script:
+    - docker pull $BASE_IMAGE:$CI_BUILD_REF .
+    - docker tag $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$CI_BUILD_REF_NAME
+    - docker push $BASE_IMAGE:$CU_BUILD_REF_NAME
+
+configure-master:
+  stage: configure
+  only:
+    - master
+  script:
+    - "curl -X POST -F token=12a58a444cc49e3249faa6d2e554a8 https://gitlab.suchgenie.de/ci/api/v1/projects/4/refs/master/trigger"
+
+configure-branch:
+  stage: configure
+  except:
+    - master
+  script:
+    - "curl -X POST -F token=12a58a444cc49e3249faa6d2e554a8 https://gitlab.suchgenie.de/ci/api/v1/projects/4/refs/$CI_BUILD_REF_NAME/trigger"
