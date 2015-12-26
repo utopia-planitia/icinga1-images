@@ -39,6 +39,11 @@ RUN apt-get install -y libjson-perl libterm-readkey-perl libmath-round-perl
 ADD dsa-check-port-closed /usr/lib/nagios/plugins/check_port_closed
 RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 
+# etcd
+COPY check_etcd /usr/lib/nagios/plugins/check_etcd
+RUN chmod +x /usr/lib/nagios/plugins/check_etcd
+RUN mkdir -p /etc/etcd/cert/
+
 # startup
 RUN mkdir -p /etc/sv/nagios && mkdir -p /etc/sv/apache && rm -rf /etc/sv/getty-5 && mkdir -p /etc/sv/postfix
 ADD nagios.init /etc/sv/nagios/run
