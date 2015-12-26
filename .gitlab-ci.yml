@@ -9,6 +9,7 @@ stages:
 build-image:
   stage: build
   script:
+    - git submodule init && git submodule update
     - docker build --pull=true -t $BASE_IMAGE:$CI_BUILD_REF .
     - docker push $BASE_IMAGE:$CI_BUILD_REF
 
