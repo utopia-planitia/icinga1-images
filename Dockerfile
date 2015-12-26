@@ -44,6 +44,12 @@ COPY check_etcd /usr/lib/nagios/plugins/check_etcd
 RUN chmod +x /usr/lib/nagios/plugins/check_etcd
 RUN mkdir -p /etc/etcd/cert/
 
+# kubectl
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.0.1/bin/linux/amd64/kubectl /usr/bin/kubectl
+RUN chmod +x /usr/bin/kubectl
+ADD check_kubectl /usr/lib/nagios/plugins/check_kubectl
+RUN chmod +x /usr/lib/nagios/plugins/check_kubectl
+
 # startup
 RUN mkdir -p /etc/sv/nagios && mkdir -p /etc/sv/apache && rm -rf /etc/sv/getty-5 && mkdir -p /etc/sv/postfix
 ADD nagios.init /etc/sv/nagios/run

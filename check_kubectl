@@ -1,0 +1,35 @@
+#! /bin/bash
+
+#This Plug-in monitors the Unreachable nodes in Cassandra Ring; using nodetool ring command
+
+# Author - Juned Memon
+
+
+
+#########THIS part is for Nagios ################################
+PROGNAME=`/usr/bin/basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
+. $PROGPATH/utils.sh
+
+#####################################################################
+
+STATUS=$( kubectl get cs )
+
+if [ "$STATUS" == "" ]; then
+        echo "[CRIT] no answer"
+        exit $STATE_CRITICAL
+fi
+
+ETCD_HEALTH=$(       echo "$STATUS" | grep etcd               | awk -F ' ' '{print $2}' )
+SCHEDULER_HEALTH=$(  echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
+CONTROLLER_HEALTH=$( echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
+
+if [ "$ETCD_HEALTH" == "Unhealthy" ] || [ "$SCHEDULER_HEALTH" == "Unhealthy" ] || [ "$CONTROLLER_HEALTH" == "Unhealthy" ]
+then
+	echo "[CRIT] etcd $ETCD_HEALTH, scheduler $SCHEDULER_HEALTH, controller-manager $CONTROLLER_HEALTH"
+	exit $STATE_CRITICAL
+fi
+
+echo "[OK] all components healthy"
+exit $STATE_OK
