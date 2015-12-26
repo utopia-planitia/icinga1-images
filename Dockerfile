@@ -1,18 +1,14 @@
-FROM ubuntu:latest
+FROM ubuntu:14.04
 
 # apt config
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 RUN sed -i 's/universe/universe multiverse/' /etc/apt/sources.list
 
-# update system
-RUN apt-get update
-RUN apt-get upgrade -y
-
 # install nagios
 RUN apt-get install -y nagios3 nagios-nrpe-plugin runit
 
-RUN apt-get install curl nmap nano --yes
+RUN apt-get install -y curl nmap nano
 
 # set apache path
 RUN sed -i.bak 's/.*\=www\-data//g' /etc/apache2/envvars
