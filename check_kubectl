@@ -70,5 +70,12 @@ then
 	exit $STATE_CRITICAL
 fi
 
-echo "[OK] all components healthy"
+BAD_PODS=$( kubectl get --all-namespaces po | tail -n +2 | awk -F ' ' '{print $4}' | grep -v Running | grep -v Pending | grep -v Terminating | wc -l )
+if [ "$BAD_PODS" -gt "0" ]
+then
+	echo "[CRIT] $BAD_PODS pods are in a bad state"
+	exit $STATE_CRITICAL
+fi
+
+echo "[OK] all k8s-components, nodes and pods look healthy"
 exit $STATE_OK
