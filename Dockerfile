@@ -1,9 +1,10 @@
-FROM ubuntu:14.04
+FROM ubuntu:15.10
 
 # apt config
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 RUN sed -i 's/universe/universe multiverse/' /etc/apt/sources.list
 RUN apt-get update
+RUN apt-get upgrade -y
 
 # install nagios
 RUN apt-get install -y nagios3 nagios-nrpe-plugin runit
