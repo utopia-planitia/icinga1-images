@@ -1,7 +1,4 @@
-# Dockerfile for icinga2, icinga-web and icinga2-classicui
 FROM ubuntu:latest
-
-MAINTAINER Joachim Breitsprecher
 
 # Dpkg configuration
 RUN echo "postfix postfix/main_mailer_type string Internet site" > dpkgconf.txt
@@ -27,14 +24,16 @@ RUN apt-get -qqy --no-install-recommends install apache2 postfix dnsutils
 # Install icinga
 RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
 
-# Clean up some.
-RUN apt-get clean
-
 ADD postfix.sh /postfix.sh
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod u+x /postfix.sh /entrypoint.sh
 
-VOLUME  ["/etc/icinga", "/var/cache/icinga", "/etc/postfix", "/var/log"]
+VOLUME /etc/icinga
+VOLUME /var/cache/icinga
+VOLUME /etc/postfix
+VOLUME /var/log
+
+EXPOSE 80
 
 # Initialize and run Supervisor
 ENTRYPOINT ["/entrypoint.sh"]
