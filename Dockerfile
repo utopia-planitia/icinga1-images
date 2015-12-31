@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:14.04
 
 # Dpkg configuration
 RUN echo "postfix postfix/main_mailer_type string Internet site" > dpkgconf.txt
