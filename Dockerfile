@@ -1,8 +1,6 @@
 FROM ubuntu:14.04
 
 # Dpkg configuration
-RUN echo "postfix postfix/main_mailer_type string Internet site" > dpkgconf.txt
-RUN debconf-set-selections dpkgconf.txt
 ENV DEBIAN_FRONTEND noninteractive
 
 # Update package lists.
@@ -19,19 +17,16 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # When depencencies are pulled in by icinga, they seem to be configured too late and configuration
 # of icinga fails. To work around this, install dependencies beforehand.
-RUN apt-get -qqy --no-install-recommends install apache2 postfix dnsutils
+RUN apt-get -qqy --no-install-recommends install apache2 dnsutils
 
 # Install icinga
 RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
 
-ADD postfix.sh /postfix.sh
 ADD entrypoint.sh /entrypoint.sh
-RUN chmod u+x /postfix.sh /entrypoint.sh
+RUN chmod u+x /entrypoint.sh
 
 VOLUME /etc/icinga
 VOLUME /var/cache/icinga
-VOLUME /etc/postfix
-VOLUME /var/log
 
 EXPOSE 80
 

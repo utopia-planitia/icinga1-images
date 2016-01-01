@@ -21,8 +21,6 @@ This container exposes these volumes:
 ```
 /etc/icinga       --> Icinga configuration files
 /var/cache/icinga --> Icinga state retention and cache files
-/etc/postfix      --> Postfix configuration
-/var/log          --> Log files.
 ```
 
 # Setting passwords
