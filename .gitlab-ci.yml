@@ -1,7 +1,7 @@
 variables:
   BASE_IMAGE: registry.suchgenie.de/icinga-extended
   BUILD_ICINGA_EXTENDED_TOKEN: 12a58a444cc49e3249faa6d2e554a8
-  BUILD_ICINGA_EXTENDED_ID: 4
+  BUILD_ICINGA_EXTENDED_ID: "4"
 
 stages:
   - build
