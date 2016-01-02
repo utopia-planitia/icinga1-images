@@ -22,14 +22,11 @@ RUN apt-get -qqy --no-install-recommends install apache2 dnsutils
 # Install icinga
 RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
 
-ADD entrypoint.sh /entrypoint.sh
-RUN chmod u+x /entrypoint.sh
-
-VOLUME /etc/icinga
-VOLUME /var/cache/icinga
+RUN gpasswd -a www-data nagios
+RUN chown -R nagios:www-data /var/lib/icinga/rw
+RUN chmod g+rwxs /var/lib/icinga/rw
 
 EXPOSE 80
 
 # Initialize and run Supervisor
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/bin/supervisord"]
