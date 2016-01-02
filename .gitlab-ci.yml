@@ -1,10 +1,12 @@
 variables:
-  BASE_IMAGE: registry.suchgenie.de/nagios
+  BASE_IMAGE: registry.suchgenie.de/icinga-extended
+  BUILD_ICINGA_EXTENDED_TOKEN: 12a58a444cc49e3249faa6d2e554a8
+  BUILD_ICINGA_EXTENDED_ID: 4
 
 stages:
   - build
   - tag
-  - configure
+  - postHook
 
 build-image:
   stage: build
@@ -13,34 +15,15 @@ build-image:
     - docker build --pull=true -t $BASE_IMAGE:$CI_BUILD_REF .
     - docker push $BASE_IMAGE:$CI_BUILD_REF
 
-tag-master:
+tag-build:
   stage: tag
-  only:
-    - master
   script:
     - docker pull $BASE_IMAGE:$CI_BUILD_REF
-    - docker tag -f $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:latest
-    - docker push $BASE_IMAGE:latest
+    - if [ "$CI_BUILD_REF_NAME" == "master" ]; then TAG_NAME="latest"; else TAG_NAME="$CI_BUILD_REF_NAME"; fi
+    - docker tag -f $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$TAG_NAME
+    - docker push $BASE_IMAGE:$TAG_NAME
 
-tag-branch:
-  stage: tag
-  except:
-    - master
+trigger-icinga-extended:
+  stage: postHook
   script:
-    - docker pull $BASE_IMAGE:$CI_BUILD_REF
-    - docker tag -f $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$CI_BUILD_REF_NAME
-    - docker push $BASE_IMAGE:$CU_BUILD_REF_NAME
-
-configure-master:
-  stage: configure
-  only:
-    - master
-  script:
-    - "curl -X POST -F token=12a58a444cc49e3249faa6d2e554a8 https://gitlab.suchgenie.de/ci/api/v1/projects/4/refs/master/trigger"
-
-configure-branch:
-  stage: configure
-  except:
-    - master
-  script:
-    - "curl -X POST -F token=12a58a444cc49e3249faa6d2e554a8 https://gitlab.suchgenie.de/ci/api/v1/projects/4/refs/$CI_BUILD_REF_NAME/trigger"
+    - "curl -X POST -F token=$BUILD_ICINGA_EXTENDED_TOKEN https://gitlab.suchgenie.de/ci/api/v1/projects/$BUILD_ICINGA_EXTENDED_ID/refs/$CI_BUILD_REF_NAME/trigger"
