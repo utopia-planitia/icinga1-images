@@ -20,7 +20,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN apt-get -qqy --no-install-recommends install apache2 dnsutils
 
 # Install icinga
-RUN apt-get -qqy install --no-install-recommends icinga nagios-plugins nagios-nrpe-plugin
+RUN apt-get -qqy install --no-install-recommends icinga icinga-docs nagios-plugins nagios-nrpe-plugin
 
 RUN gpasswd -a www-data nagios
 RUN chown -R nagios:www-data /var/lib/icinga/rw
