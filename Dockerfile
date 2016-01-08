@@ -30,3 +30,8 @@ EXPOSE 80
 
 # Initialize and run Supervisor
 CMD ["/usr/bin/supervisord"]
+
+COPY apache-icinga.conf /etc/apache2/conf-enabled/icinga.conf
+COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's/use_authentication=1/use_authentication=0/g' /etc/icinga/cgi.cfg
+RUN ln -s /etc/icinga/stylesheets /usr/share/icinga/htdocs/stylesheets
