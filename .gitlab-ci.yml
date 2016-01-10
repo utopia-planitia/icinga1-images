@@ -1,7 +1,7 @@
 variables:
   BASE_IMAGE: registry.suchgenie.de/icinga-extended
-  BUILD_ICINGA_EXTENDED_TOKEN: 12a58a444cc49e3249faa6d2e554a8
-  BUILD_ICINGA_EXTENDED_ID: "4"
+  BUILD_ICINGA_CONFIGURED_TOKEN: 12a58a444cc49e3249faa6d2e554a8
+  BUILD_ICINGA_CONFIGURED_ID: "4"
 
 stages:
   - build
@@ -26,4 +26,4 @@ tag-build:
 trigger-icinga-extended:
   stage: postHook
   script:
-    - "curl -X POST -F token=$BUILD_ICINGA_EXTENDED_TOKEN https://gitlab.suchgenie.de/ci/api/v1/projects/$BUILD_ICINGA_EXTENDED_ID/refs/$CI_BUILD_REF_NAME/trigger"
+    - "curl -X POST -F token=$BUILD_ICINGA_CONFIGURED_TOKEN https://gitlab.suchgenie.de/ci/api/v1/projects/$BUILD_ICINGA_CONFIGURED_ID/refs/$CI_BUILD_REF_NAME/trigger"
