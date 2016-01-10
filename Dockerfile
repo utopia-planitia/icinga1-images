@@ -37,8 +37,3 @@ ADD https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/a
 RUN chmod +x /usr/bin/kubectl
 ADD check_kubectl /usr/lib/nagios/plugins/check_kubectl
 RUN chmod +x /usr/lib/nagios/plugins/check_kubectl
-
-# control access
-COPY htpasswd.users /etc/icinga/htpasswd.users
-
-RUN sed -i "s,check_external_commands=0,check_external_commands=1," /etc/icinga/icinga.cfg
