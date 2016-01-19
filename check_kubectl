@@ -61,7 +61,7 @@ then
 	exit $STATE_CRITICAL
 fi
 
-NODES=$( kubectl get no | tail -n +2 | grep Ready | wc -l )
+NODES=$( kubectl get no | tail -n +2 | grep Ready | grep -v NotReady | wc -l )
 if [ "$NODES" -lt "$MINIMUM_NODE_COUNT" ]
 then
 	echo "[CRIT] only $NODES nodes Ready, $MINIMUM_NODE_COUNT desired"
