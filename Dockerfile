@@ -32,6 +32,8 @@ EXPOSE 80
 # Initialize and run Supervisor
 CMD ["/usr/bin/supervisord"]
 
+Volume /var/cache/icinga
+
 COPY apache-icinga.conf /etc/apache2/conf-enabled/icinga.conf
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 RUN ln -s /etc/icinga/stylesheets /usr/share/icinga/htdocs/stylesheets
