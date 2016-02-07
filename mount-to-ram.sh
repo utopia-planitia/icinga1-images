@@ -9,5 +9,6 @@ mkdir /var/lib/icinga/spool
 mkdir /var/lib/icinga/spool/checkresults
 
 chown nagios. -R /dev/shm/var-lib-icinga
+chown nagios. -R /var/cache/icinga
 
 /usr/bin/supervisord
