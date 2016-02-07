@@ -4,6 +4,7 @@ FROM ubuntu:15.10
 ENV DEBIAN_FRONTEND noninteractive
 
 # Update package lists.
+ENV RESET_BUILD_CACHE 2016-02-07
 RUN apt-get -qq update
 
 # Install basic packages.
