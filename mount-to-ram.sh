@@ -9,3 +9,5 @@ mkdir /var/lib/nagios3/spool
 mkdir /var/lib/nagios3/spool/checkresults
 
 chown nagios. -R /dev/shm/var-lib-nagios3
+
+/usr/bin/supervisord
