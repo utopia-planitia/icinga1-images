@@ -1,13 +1,13 @@
 #!/bin/bash
 
 rm -r /var/lib/icinga
-mkdir /dev/shm/var-lib-nagios3
-ln -s /dev/shm/var-lib-nagios3 /var/lib/nagios3
+mkdir /dev/shm/var-lib-icinga
+ln -s /dev/shm/var-lib-icinga /var/lib/icinga
 
-mkdir /var/lib/nagios3/rw
-mkdir /var/lib/nagios3/spool
-mkdir /var/lib/nagios3/spool/checkresults
+mkdir /var/lib/icinga/rw
+mkdir /var/lib/icinga/spool
+mkdir /var/lib/icinga/spool/checkresults
 
-chown nagios. -R /dev/shm/var-lib-nagios3
+chown nagios. -R /dev/shm/var-lib-icinga
 
 /usr/bin/supervisord
