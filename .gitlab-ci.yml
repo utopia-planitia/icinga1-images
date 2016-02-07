@@ -23,7 +23,7 @@ tag-build:
     - docker tag -f $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$TAG_NAME
     - docker push $BASE_IMAGE:$TAG_NAME
 
-trigger-icinga-extended:
+trigger-icinga-configured:
   stage: postHook
   script:
     - "curl -X POST -F token=$BUILD_ICINGA_CONFIGURED_TOKEN https://gitlab.suchgenie.de/ci/api/v1/projects/$BUILD_ICINGA_CONFIGURED_ID/refs/$CI_BUILD_REF_NAME/trigger"
