@@ -1,7 +1,5 @@
 variables:
   BASE_IMAGE: registry.suchgenie.de/icinga
-  BUILD_ICINGA_EXTENDED_TOKEN: 7be06cc0eee784d904909ee9e07646
-  BUILD_ICINGA_EXTENDED_ID: "5"
 
 stages:
   - build
@@ -21,8 +19,3 @@ tag-build:
     - if [ "$CI_BUILD_REF_NAME" == "master" ]; then TAG_NAME="latest"; else TAG_NAME="$CI_BUILD_REF_NAME"; fi
     - docker tag -f $BASE_IMAGE:$CI_BUILD_REF $BASE_IMAGE:$TAG_NAME
     - docker push $BASE_IMAGE:$TAG_NAME
-
-trigger-icinga-extended:
-  stage: postHook
-  script:
-    - "curl -X POST -F token=$BUILD_ICINGA_EXTENDED_TOKEN https://gitlab.suchgenie.de/ci/api/v1/projects/$BUILD_ICINGA_EXTENDED_ID/refs/$CI_BUILD_REF_NAME/trigger"
