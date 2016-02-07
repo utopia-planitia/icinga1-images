@@ -1,5 +1,8 @@
 FROM registry.suchgenie.de/icinga
 
+ENV RESET_BUILD_CACHE 2016-02-07
+RUN apt-get update
+
 RUN apt-get install -qqy curl nmap nano
 
 # memcache check
@@ -37,3 +40,12 @@ ADD https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/a
 RUN chmod +x /usr/bin/kubectl
 ADD check_kubectl /usr/lib/nagios/plugins/check_kubectl
 RUN chmod +x /usr/lib/nagios/plugins/check_kubectl
+
+# cephfs
+RUN apt-get install -qqy ceph-common
+COPY ceph/check_ceph_health /usr/lib/nagios/plugins/check_ceph_health
+COPY ceph/check_ceph_mon /usr/lib/nagios/plugins/check_ceph_mon
+COPY ceph/check_ceph_osd /usr/lib/nagios/plugins/check_ceph_osd
+COPY ceph/check_ceph_rgw /usr/lib/nagios/plugins/check_ceph_rgw
+RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
+RUN mkdir /etc/ceph
