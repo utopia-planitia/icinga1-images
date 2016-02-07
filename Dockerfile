@@ -1,4 +1,4 @@
-FROM registry.suchgenie.de/icinga
+FROM registry.suchgenie.de/icinga:4423a68adc14e68e84693f27c28c8a64eca1c0be
 
 ENV RESET_BUILD_CACHE 2016-02-07
 RUN apt-get -qq update
