@@ -1,13 +1,9 @@
-FROM registry.suchgenie.de/icinga:4423a68adc14e68e84693f27c28c8a64eca1c0be
+FROM registry.suchgenie.de/icinga:c165a20c03500ab2ba251fff28b6f667089993fd
 
 ENV RESET_BUILD_CACHE 2016-02-07
 RUN apt-get -qq update
 
 RUN apt-get install -qqy curl nmap nano
-
-COPY mount-to-ram.sh /mount-to-ram.sh
-RUN chmod +x /mount-to-ram.sh
-CMD ["/mount-to-ram.sh"]
 
 # memcache check
 # from http://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3609&cf_id=24 
