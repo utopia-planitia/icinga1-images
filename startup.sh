@@ -21,4 +21,7 @@ chown nagios:www-data -R /var/lib/icinga
 chmod g+rwxs /var/lib/icinga/rw
 chown nagios:www-data -R /var/cache/icinga
 
+mkdir /var/log/icinga/archives/
+chown nagios:www-data -R /var/log/icinga/archives/
+
 /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
