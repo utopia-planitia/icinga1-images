@@ -36,10 +36,10 @@ STATUS_UNKNOWN = 3
 def main():
 
   # parse args
-  parser = argparse.ArgumentParser(description="'ceph osd' nagios plugin.")
+  parser = argparse.ArgumentParser(description="'ceph mds' nagios plugin.")
   parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
   parser.add_argument('-c','--conf', help='alternative ceph conf file')
-  parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
+  parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
   parser.add_argument('-i','--id', help='ceph client id')
   parser.add_argument('-k','--keyring', help='ceph client keyring file')
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
@@ -48,7 +48,7 @@ def main():
   # validate args
   ceph_exec = args.exe if args.exe else CEPH_COMMAND
   if not os.path.exists(ceph_exec):
-    print "OSD ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+    print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
     return STATUS_UNKNOWN
 
   if args.version:
@@ -84,21 +84,21 @@ def main():
   p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, err = p.communicate()
 
-  active = re.findall(r".*active.*" % (args.osdid), output, re.MULTILINE)
+  active = re.findall(r".*active.*", output, re.MULTILINE)
   if not active:
-    print "ERROR: no active MDS found" % args.osdid
+    print "ERROR: no active MDS found"
     return STATUS_ERROR
 
-  standby = re.findall(r".*standby.*" % (args.osdid), output, re.MULTILINE)
+  standby = re.findall(r".*standby.*", output, re.MULTILINE)
   if not active:
-    print "WARNING: no standby MDS found" % args.osdid
+    print "WARNING: no standby MDS found"
     return STATUS_WARNING
 
   if err:
     print "ERROR: %s" % err
     return STATUS_ERROR
 
-  print "ERROR: no MDS found" % (args.osdid)
+  print "ERROR: no MDS found"
   return STATUS_ERROR
 
 if __name__ == "__main__":
