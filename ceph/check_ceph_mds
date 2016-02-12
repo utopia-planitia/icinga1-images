@@ -84,10 +84,6 @@ def main():
   p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, err = p.communicate()
 
-  if err or not output:
-    print "ERROR: %s" % err
-    return STATUS_ERROR
-
   active = re.findall(r".*active.*" % (args.osdid), output, re.MULTILINE)
   if not active:
     print "ERROR: no active MDS found" % args.osdid
@@ -97,6 +93,10 @@ def main():
   if not active:
     print "WARNING: no standby MDS found" % args.osdid
     return STATUS_WARNING
+
+  if err:
+    print "ERROR: %s" % err
+    return STATUS_ERROR
 
   print "ERROR: no MDS found" % (args.osdid)
   return STATUS_ERROR
