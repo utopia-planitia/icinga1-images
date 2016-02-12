@@ -47,5 +47,6 @@ COPY ceph/check_ceph_health /usr/lib/nagios/plugins/check_ceph_health
 COPY ceph/check_ceph_mon /usr/lib/nagios/plugins/check_ceph_mon
 COPY ceph/check_ceph_osd /usr/lib/nagios/plugins/check_ceph_osd
 COPY ceph/check_ceph_rgw /usr/lib/nagios/plugins/check_ceph_rgw
+COPY ceph/check_ceph_msd /usr/lib/nagios/plugins/check_ceph_mds
 RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
 RUN mkdir /etc/ceph
