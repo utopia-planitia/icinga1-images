@@ -94,12 +94,8 @@ def main():
     print "WARNING: no standby MDS found"
     return STATUS_WARNING
 
-  if err:
-    print "ERROR: %s" % err
-    return STATUS_ERROR
-
-  print "ERROR: no MDS found"
-  return STATUS_ERROR
+  print "OK: active and standby MDS found"
+  return STATUS_OK
 
 if __name__ == "__main__":
     sys.exit(main())
