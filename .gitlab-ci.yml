@@ -1,12 +1,7 @@
 variables:
   BASE_IMAGE: registry.suchgenie.de/icinga-extended
 
-stages:
-  - build
-  - tag
-  - postHook
-
-build-image:
+dockerimage:
   stage: build
   script:
     - git submodule init && git submodule update
