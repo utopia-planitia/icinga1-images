@@ -1,12 +1,12 @@
-FROM registry.suchgenie.de/icinga:f9da28d52c356e4cd32fc2f30c9bc2ed6e7f8d8f
+FROM registry.suchgenie.de/icinga:98f0f114f42a6609a34d3768debd6021bb28d19d
 
-ENV RESET_BUILD_CACHE 2016-02-07
+ENV RESET_BUILD_CACHE 2017-02-19
 RUN apt-get -qq update
 
 RUN apt-get install -qqy curl nmap nano
 
 # memcache check
-# from http://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3609&cf_id=24 
+# from http://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3609&cf_id=24
 ADD check_memcached.pl /usr/lib/nagios/plugins/check_memcached.pl
 RUN chmod +x /usr/lib/nagios/plugins/check_memcached.pl
 RUN apt-get install -qqy libcache-memcached-perl
@@ -18,7 +18,7 @@ RUN chmod +x /usr/lib/nagios/plugins/check_postgres.pl
 RUN apt-get install -qqy postgresql-client
 
 # zookeeper check
-# from https://raw.githubusercontent.com/harisekhon/nagios-plugins/master/check_zookeeper.pl 
+# from https://raw.githubusercontent.com/harisekhon/nagios-plugins/master/check_zookeeper.pl
 ADD check_zookeeper.pl /usr/lib/nagios/plugins/check_zookeeper.pl
 RUN chmod +x /usr/lib/nagios/plugins/check_zookeeper.pl
 ADD harisekhon /usr/lib/nagios/plugins/lib/

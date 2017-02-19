@@ -1,9 +1,12 @@
 variables:
   BASE_IMAGE: registry.suchgenie.de/icinga-extended
+  GIT_SUBMODULE_STRATEGY: recursive
 
 dockerimage:
   stage: build
+  iamge: docker
+  services:
+    - docker
   script:
-    - git submodule init && git submodule update
     - docker build --pull=true -t $BASE_IMAGE:$CI_BUILD_REF .
     - docker push $BASE_IMAGE:$CI_BUILD_REF
