@@ -3,6 +3,9 @@ variables:
 
 dockerimage:
   stage: build
+  image: docker
+  services:
+    - docker
   script:
     - docker build --pull=true -t $BASE_IMAGE:$CI_BUILD_REF .
     - docker push $BASE_IMAGE:$CI_BUILD_REF
