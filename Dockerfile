@@ -1,10 +1,10 @@
-FROM ubuntu:15.10
+FROM ubuntu:16.10
 
 # Dpkg configuration
 ENV DEBIAN_FRONTEND noninteractive
 
 # Update package lists.
-ENV RESET_BUILD_CACHE 2016-02-07
+ENV RESET_BUILD_CACHE 2017-02-19
 RUN apt-get -qq update
 
 # Install basic packages.
