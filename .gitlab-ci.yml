@@ -22,7 +22,7 @@ docker image:
     - docker push $DOCKER_IMAGE:$CI_BUILD_REF
 
 tag latest:
-  stage: build
+  stage: tag
   image: docker:1.13.1
   services:
     - docker:1.13.1-dind
