@@ -1,6 +1,5 @@
-FROM registry.suchgenie.de/icinga:98f0f114f42a6609a34d3768debd6021bb28d19d
+FROM registry.suchgenie.de/icinga:385761bc30bef703a5715fa310558c754d13330c
 
-ENV RESET_BUILD_CACHE 2017-02-19
 RUN apt-get -qq update
 
 RUN apt-get install -qqy curl nmap nano
