@@ -35,7 +35,7 @@ RUN chmod +x /usr/lib/nagios/plugins/check_etcd
 RUN mkdir -p /etc/etcd/cert/
 
 # kubectl
-ADD https://storage.googleapis.com/kubernetes-release/release/v1.1.3/bin/linux/amd64/kubectl /usr/bin/kubectl
+ADD https://storage.googleapis.com/kubernetes-release/release/v1.6.4/bin/linux/amd64/kubectl /usr/bin/kubectl
 RUN chmod +x /usr/bin/kubectl
 ADD check_kubectl /usr/lib/nagios/plugins/check_kubectl
 RUN chmod +x /usr/lib/nagios/plugins/check_kubectl
