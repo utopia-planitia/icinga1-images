@@ -1,4 +1,4 @@
-FROM registry.suchgenie.de/icinga:385761bc30bef703a5715fa310558c754d13330c
+FROM registry.suchgenie.de/platform/icinga:40cf93060f71196339399770df50a26eb787d09a
 
 RUN apt-get -qq update
 
