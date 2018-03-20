@@ -2,10 +2,12 @@ FROM ubuntu:17.10 AS icinga
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
-    apt-get -y install --no-install-recommends less sudo procps ca-certificates wget pwgen && \
-    apt-get -qqy install --no-install-recommends supervisor && \
-    apt-get -qqy --no-install-recommends install apache2 dnsutils && \
-    apt-get -qqy install --no-install-recommends icinga icinga-doc nagios-plugins nagios-nrpe-plugin && \
+    apt-get -y install --no-install-recommends \
+        less sudo procps ca-certificates wget pwgen \
+        supervisor \
+        apache2 dnsutils \
+        icinga icinga-doc nagios-plugins nagios-nrpe-plugin \
+        curl nano && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
@@ -31,7 +33,7 @@ RUN sed -i 's/#default_user_name=guest/default_user_name=icingaadmin/g' /etc/ici
 FROM icinga AS plugins
 
 RUN apt-get update && \
-    apt-get -y install --no-install-recommends curl nmap nano libcache-memcached-perl postgresql-client ceph-common && \
+    apt-get -y install --no-install-recommends nmap libcache-memcached-perl postgresql-client ceph-common && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
