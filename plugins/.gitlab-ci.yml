@@ -1,0 +1,34 @@
+variables:
+  DOCKER_IMAGE: $DOCKER_REGISTRY/$CI_PROJECT_PATH
+  DOCKER_DRIVER: overlay
+  DOCKER_HOST: tcp://localhost:2375
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - build
+  - tag
+
+before_script:
+  - docker login --username $DOCKER_REGISTRY_USERNAME --password $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY
+
+docker image:
+  stage: build
+  image: docker:1.13.1
+  services:
+    - docker:1.13.1-dind
+  script:
+    - docker pull $DOCKER_IMAGE:latest || true
+    - docker build --cache-from=$DOCKER_IMAGE:latest -t $DOCKER_IMAGE:$CI_BUILD_REF .
+    - docker push $DOCKER_IMAGE:$CI_BUILD_REF
+
+tag latest:
+  stage: tag
+  image: docker:1.13.1
+  services:
+    - docker:1.13.1-dind
+  script:
+    - docker pull $DOCKER_IMAGE:$CI_BUILD_REF
+    - docker tag $DOCKER_IMAGE:$CI_BUILD_REF $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:latest
+  only:
+    - master
