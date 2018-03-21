@@ -1,4 +1,4 @@
-FROM ubuntu:17.10 AS icinga
+FROM ubuntu:17.10
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -30,7 +30,6 @@ RUN sed -i 's/#default_user_name=guest/default_user_name=icingaadmin/g' /etc/ici
 
 
 
-FROM icinga AS plugins
 
 RUN apt-get update && \
     apt-get -y install --no-install-recommends nmap libcache-memcached-perl postgresql-client ceph-common && \

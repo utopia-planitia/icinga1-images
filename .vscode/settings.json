@@ -1,0 +1,11 @@
+{
+    "files.exclude": {
+        ".devtools": true,
+        ".devtools-deploy": true,
+        ".server": true,
+        ".server-deploy": true,
+        ".client": true,
+        ".client-deploy": true,
+        "*.log": true
+    }
+}

@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: server
+  namespace: alerting
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: dispatcher
+          image: utopiaplanitia/alerting-server:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+              name: http
+          livenessProbe:
+            tcpSocket:
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: server
+  namespace: alerting
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+  selector:
+    app: server

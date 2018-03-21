@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: client
+  namespace: alerting
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: client
+    spec:
+      containers:
+        - name: dispatcher
+          image: utopiaplanitia/alerting-client:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5666
+              name: nrpe
+          livenessProbe:
+            tcpSocket:
+              port: 5666
+          readinessProbe:
+            tcpSocket:
+              port: 5666
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: client
+  namespace: alerting
+spec:
+  clusterIP: None
+  ports:
+    - port: 80
+  selector:
+    app: client

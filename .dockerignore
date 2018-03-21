@@ -1,0 +1,10 @@
+/.dockerignore
+/.git
+/.gitignore
+/Makefile
+/docker-compose.yaml
+/docker-image-cache
+/.minikube
+/minikube
+/kubectl
+/hack
