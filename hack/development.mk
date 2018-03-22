@@ -17,6 +17,14 @@ deploy: .server .client .devtools ##@development Deploys the current code.
 		-v $(PWD):/project -w /project \
 		utopiaplanitia/alerting-devtools:latest ./hack/await-open-ports.sh
 
+.PHONY: open
+open: ##@development Open icinga dashboard in browser.
+	minikube service -n alerting server
+
+.PHONY: logs
+logs: ##@development Show logs.
+	ktail -n alerting
+
 .PHONY: redeploy
 redeploy: .dispatcher-deploy .worker-deploy ##@development Redeploys changed code.
 	kubectl apply -f kubernetes/mirror.yaml -f kubernetes/cache.yaml

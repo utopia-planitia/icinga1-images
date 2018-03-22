@@ -12,9 +12,6 @@ RUN apt-get update && \
     gpasswd -a www-data nagios
 
 EXPOSE 80
-VOLUME /etc/icinga
-VOLUME /var/log/icinga
-VOLUME /var/cache/icinga
 
 COPY icinga/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY icinga/entrypoint.sh /entrypoint.sh
@@ -25,10 +22,8 @@ RUN mv /etc/icinga/stylesheets /usr/share/icinga/htdocs/stylesheets
 COPY icinga/apache-icinga.conf /etc/apache2/conf-enabled/icinga.conf
 COPY icinga/000-default.conf  /etc/apache2/sites-available/000-default.conf
 
-RUN sed -i "s,check_external_commands=0,check_external_commands=1," /etc/icinga/icinga.cfg
+RUN sed -i 's/check_external_commands=0/check_external_commands=1/g' /etc/icinga/icinga.cfg
 RUN sed -i 's/#default_user_name=guest/default_user_name=icingaadmin/g' /etc/icinga/cgi.cfg
-
-
 
 
 RUN apt-get update && \
