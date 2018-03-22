@@ -5,3 +5,6 @@
 /.server-deploy
 /.client
 /.client-deploy
+/client/ssl
+/server/ssl
+/secrets/

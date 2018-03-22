@@ -66,3 +66,7 @@ COPY plugins/ceph/check_ceph_mds /usr/lib/nagios/plugins/check_ceph_mds
 RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
 
 COPY objects /etc/icinga/objects
+
+COPY ssl /ssl
+
+COPY check_nrpe.cfg /etc/nagios-plugins/config/check_nrpe.cfg

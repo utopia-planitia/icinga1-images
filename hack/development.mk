@@ -7,6 +7,14 @@ cli: .devtools ##@development Opens a command line interface with development to
 		-v $(PWD):/project -w /project \
 		utopiaplanitia/alerting-devtools:latest bash
 
+.PHONY: cli-server
+cli-server: ##@development Opens a command line interface to the server.
+	kubectl -n alerting exec -ti $(shell kubectl -n alerting get po -o=jsonpath='{.items[0].metadata.name}' -l app=server) bash
+
+.PHONY: cli-client
+cli-client: ##@development Opens a command line interface to the client.
+	kubectl -n alerting exec -ti $(shell kubectl -n alerting get po -o=jsonpath='{.items[0].metadata.name}' -l app=client) bash
+
 .PHONY: deploy
 deploy: .server .client .devtools ##@development Deploys the current code.
 	kubectl apply -f kubernetes/namespace.yaml -f kubernetes
