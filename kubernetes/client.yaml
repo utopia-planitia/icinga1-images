@@ -11,7 +11,7 @@ spec:
         app: client
     spec:
       containers:
-        - name: dispatcher
+        - name: client
           image: utopiaplanitia/alerting-client:latest
           imagePullPolicy: Never
           ports:

@@ -20,4 +20,4 @@ stop: ##@setup Stops minikube.
 
 .PHONY: logs
 logs: ##@setup Shows logs.
-	ktail -n container-image-builder
+	ktail -n alerting

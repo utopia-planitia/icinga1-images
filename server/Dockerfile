@@ -64,3 +64,5 @@ COPY plugins/ceph/check_ceph_osd /usr/lib/nagios/plugins/check_ceph_osd
 COPY plugins/ceph/check_ceph_rgw /usr/lib/nagios/plugins/check_ceph_rgw
 COPY plugins/ceph/check_ceph_mds /usr/lib/nagios/plugins/check_ceph_mds
 RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
+
+COPY objects /etc/icinga/objects

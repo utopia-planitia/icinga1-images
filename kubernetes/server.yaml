@@ -11,7 +11,7 @@ spec:
         app: server
     spec:
       containers:
-        - name: dispatcher
+        - name: server
           image: utopiaplanitia/alerting-server:latest
           imagePullPolicy: Never
           ports:

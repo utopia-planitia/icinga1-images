@@ -21,13 +21,8 @@ deploy: .server .client .devtools ##@development Deploys the current code.
 open: ##@development Open icinga dashboard in browser.
 	minikube service -n alerting server
 
-.PHONY: logs
-logs: ##@development Show logs.
-	ktail -n alerting
-
 .PHONY: redeploy
-redeploy: .dispatcher-deploy .worker-deploy ##@development Redeploys changed code.
-	kubectl apply -f kubernetes/mirror.yaml -f kubernetes/cache.yaml
+redeploy: .server-deploy .client-deploy ##@development Redeploys changed code.
 	./hack/await-pods.sh
 	docker run -ti --rm \
 		--dns 10.96.0.10 --dns-search alerting.svc.cluster.local \
@@ -38,12 +33,12 @@ redeploy: .dispatcher-deploy .worker-deploy ##@development Redeploys changed cod
 .server-deploy: .server kubernetes/server.yaml
 	kubectl apply -f kubernetes/server.yaml
 	kubectl -n alerting delete po -l app=server
-	touch .dispatcher-deploy
+	touch .server-deploy
 
 .client-deploy: .client kubernetes/client.yaml
 	kubectl apply -f kubernetes/client.yaml
 	kubectl -n alerting delete po -l app=client
-	touch .worker-deploy
+	touch .client-deploy
 
 .devtools: $(shell find hack/devtools -type f)
 	docker build -t utopiaplanitia/alerting-devtools:latest hack/devtools
