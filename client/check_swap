@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+#Set script name
+SCRIPT=`basename ${BASH_SOURCE[0]}`
+
+#Set default values
+optSW=80
+optSC=90
+
+# help function
+function printHelp {
+  echo -e \\n"Help for $SCRIPT"\\n
+  echo -e "Basic usage: $SCRIPT -w {warning} -c {critical}"\\n
+  echo "Command switches are optional, default values for warning is 80% and critical is 90%"
+  echo "-w - Sets warning value for Swap Usage. Default is 80%"
+  echo "-c - Sets critical value for Swap Usage. Default is 90%"
+  echo -e "-h  - Displays this help message"\\n
+  echo -e "Example: $SCRIPT -w 80 -c 90"\\n
+  echo -e \\n\\n"Author: Lukasz Gogolin, lukasz.gogolin@gmail.com"
+  echo -e "Git: http://bitbucket.org/lgogolin/nagios_plugins"
+  exit 1
+}
+
+# regex to check is OPTARG an integer
+re='^[0-9]+$'
+
+while getopts :w:c:W:C:h FLAG; do
+  case $FLAG in
+    w)
+      if ! [[ $OPTARG =~ $re ]] ; then
+        echo "error: Not a number" >&2; exit 1
+      else
+        optSW=$OPTARG
+      fi
+      ;;
+    c)
+      if ! [[ $OPTARG =~ $re ]] ; then
+        echo "error: Not a number" >&2; exit 1
+      else
+        optSC=$OPTARG
+      fi
+      ;;
+    h)
+      printHelp
+      ;;
+    \?)
+      echo -e \\n"Option - $OPTARG not allowed."
+      printHelp
+      exit 2
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+array=( $(cat /proc/meminfo | egrep 'MemTotal|MemFree|Buffers|Cached|SwapTotal|SwapFree' |awk '{print $1 " " $2}' |tr '\n' ' ' |tr -d ':' |awk '{ printf("%i %i %i %i %i %i %i", $2, $4, $6, $8, $10, $12, $14) }') )
+
+swapTotal_k=${array[5]}
+swapTotal_b=$(($swapTotal_k*1024))
+swapFree_k=${array[6]}
+swapFree_b=$(($swapFree_k*1024))
+swapUsed_k=$(($swapTotal_k-$swapFree_k))
+swapUsed_b=$(($swapUsed_k*1024))
+swapTotal_m=$(($swapTotal_k/1024))
+swapFree_m=$(($swapFree_k/1024))
+swapUsed_m=$(($swapTotal_m-$swapFree_m))
+
+if [ $swapTotal_k -eq 0 ]; then
+    swapUsedPrc=0
+else
+    swapUsedPrc=$((($swapUsed_k*100)/$swapTotal_k))
+fi
+
+MESSAGE="Total: $swapTotal_m MB - Used: $swapUsed_m MB - $swapUsedPrc% | STOTAL=$swapTotal_b;;;; SUSED=$swapUsed_b;;;;"
+
+if [ $swapUsedPrc -ge $optSC ]; then
+  echo "[CRIT] $MESSAGE"
+  exit 2
+fi
+if [ $swapUsedPrc -ge $optSW ]; then
+  echo "[WARN] $MESSAGE"
+  exit 1
+fi
+echo "[OK] $MESSAGE"
+exit 0
