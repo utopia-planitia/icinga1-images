@@ -1,0 +1,33 @@
+#!/bin/bash
+
+PROGNAME=`/usr/bin/basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+. $PROGPATH/utils.sh
+
+timeout 2 docker version > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[CRIT] docker version failed"
+        exit $STATE_CRITICAL
+fi
+
+timeout 4 docker ps > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[CRIT] docker ps failed"
+        exit $STATE_CRITICAL
+fi
+
+timeout 20 docker pull hello-world > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[CRIT] docker pull failed"
+        exit $STATE_CRITICAL
+fi
+
+timeout 2 docker run --rm hello-world > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[CRIT] docker pull failed"
+        exit $STATE_CRITICAL
+fi
+
+
+echo "[OK] - docker version, ps, pull and run succeeded"
+exit $STATE_OK

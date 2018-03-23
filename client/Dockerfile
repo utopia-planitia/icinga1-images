@@ -24,6 +24,8 @@ RUN curl -o /usr/lib/nagios/plugins/check_smartmon https://raw.githubusercontent
 RUN curl -o /usr/lib/nagios/plugins/check_open_files "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3328&cf_id=24" && \
     chmod +x /usr/lib/nagios/plugins/check_open_files
 
+COPY check_docker /usr/lib/nagios/plugins/check_docker
+
 EXPOSE 5666
 
 RUN sed -i 's/#log_file=\/var\/log\/nrpe.log/log_file=\/var\/log\/nrpe.log/g' /etc/nagios/nrpe.cfg
