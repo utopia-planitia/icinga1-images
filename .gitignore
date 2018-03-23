@@ -5,6 +5,9 @@
 /.server-deploy
 /.client
 /.client-deploy
+/.secrets
+
+# PRODUCTION SETUP: remove these lines
 /client/ssl
 /server/ssl
 /secrets/
