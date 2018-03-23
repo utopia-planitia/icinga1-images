@@ -65,6 +65,7 @@ COPY plugins/ceph/check_ceph_rgw /usr/lib/nagios/plugins/check_ceph_rgw
 COPY plugins/ceph/check_ceph_mds /usr/lib/nagios/plugins/check_ceph_mds
 RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
 
+RUN rm -rf /etc/icinga/objects
 COPY objects /etc/icinga/objects
 
 COPY ssl /ssl
