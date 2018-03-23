@@ -8,9 +8,21 @@ COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
-    apt-get -y install --no-install-recommends \
-        nagios-nrpe-server monitoring-plugins && \
+    apt-get -y install \
+        nagios-nrpe-server \
+        monitoring-plugins \
+        curl \
+        gcc python-dev python-pip smartmontools \
+        sudo \
+        && \
     rm -rf /var/lib/apt/lists/*
+
+RUN curl -o /usr/lib/nagios/plugins/check_smartmon https://raw.githubusercontent.com/nihlaeth/Nagios_check_smartmon/master/check_smartmon.py && \
+    chmod +x /usr/lib/nagios/plugins/check_smartmon && \
+    pip install psutil
+
+RUN curl -o /usr/lib/nagios/plugins/check_open_files "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3328&cf_id=24" && \
+    chmod +x /usr/lib/nagios/plugins/check_open_files
 
 EXPOSE 5666
 
@@ -19,8 +31,8 @@ RUN sed -i 's/allowed_hosts=127.0.0.1,::1/#allowed_hosts=127.0.0.1,::1/g' /etc/n
 RUN sed -i 's/pid_file=\/var\/run\/nagios\/nrpe.pid/#pid_file=\/var\/run\/nagios\/nrpe.pid/g' /etc/nagios/nrpe.cfg
 #RUN sed -i 's/debug=0/debug=1/g' /etc/nagios/nrpe.cfg
 
-#RUN echo "nagios          ALL=(ALL) NOPASSWD: /usr/lib/nagios/plugins/" >> /etc/sudoers
-#RUN sed -i 's/# command_prefix=\/usr\/bin\/sudo/command_prefix=\/usr\/bin\/sudo/g' /etc/nagios/nrpe.cfg
+RUN echo "nagios          ALL=(ALL) NOPASSWD: /usr/lib/nagios/plugins/" >> /etc/sudoers
+RUN sed -i 's/# command_prefix=\/usr\/bin\/sudo/command_prefix=\/usr\/bin\/sudo/g' /etc/nagios/nrpe.cfg
 
 CMD ["/usr/sbin/nrpe", "-c", "/etc/nagios/nrpe.cfg", "-f"]
 
@@ -30,3 +42,4 @@ RUN sed -i 's/#ssl_privatekey_file=\/etc\/ssl\/servercerts\/nagios-key.pem/ssl_p
 RUN sed -i 's/#ssl_client_certs=0/ssl_client_certs=2/g' /etc/nagios/nrpe.cfg
 
 COPY ssl /ssl
+COPY nrpe_local.cfg /etc/nagios/nrpe_local.cfg
