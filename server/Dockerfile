@@ -42,7 +42,7 @@ RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 RUN curl -o /usr/bin/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && \
     chmod +x /usr/bin/kubectl
 ADD plugins/check_kubernetes /usr/lib/nagios/plugins/check_kubernetes
-RUN chmod +x /usr/lib/nagios/plugins/check_kubernetes
+ADD plugins/check_pods /usr/lib/nagios/plugins/check_pods
 
 # cephfs
 COPY plugins/ceph/check_ceph_health /usr/lib/nagios/plugins/check_ceph_health

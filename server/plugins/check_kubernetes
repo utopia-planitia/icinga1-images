@@ -54,14 +54,29 @@ if [ "$STATUS" == "" ]; then
         exit $STATE_CRITICAL
 fi
 
-ETCD0_HEALTH=$(      echo "$STATUS" | grep etcd-0             | awk -F ' ' '{print $2}' )
-ETCD1_HEALTH=$(      echo "$STATUS" | grep etcd-1             | awk -F ' ' '{print $2}' )
-ETCD2_HEALTH=$(      echo "$STATUS" | grep etcd-2             | awk -F ' ' '{print $2}' )
-SCHEDULER_HEALTH=$(  echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
-CONTROLLER_HEALTH=$( echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
-if [ "$ETCD0_HEALTH" != "Healthy" ] || [ "$ETCD1_HEALTH" != "Healthy" ] || [ "$ETCD2_HEALTH" != "Healthy" ] || [ "$SCHEDULER_HEALTH" != "Healthy" ] || [ "$CONTROLLER_HEALTH" != "Healthy" ]
-then
-	echo "[CRIT] etcd-0 $ETCD0_HEALTH, etcd-1 $ETCD1_HEALTH, etcd-2 $ETCD2_HEALTH, scheduler $SCHEDULER_HEALTH, controller-manager $CONTROLLER_HEALTH"
+HEALTH=$(      echo "$STATUS" | grep etcd-0             | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "Healthy" ]; then
+	echo "[CRIT] etcd-0 is not healthy"
+	exit $STATE_CRITICAL
+fi
+HEALTH=$(      echo "$STATUS" | grep etcd-1             | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "Healthy" ]; then
+	echo "[CRIT] etcd-1 is not healthy"
+	exit $STATE_CRITICAL
+fi
+HEALTH=$(      echo "$STATUS" | grep etcd-2             | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "Healthy" ]; then
+	echo "[CRIT] etcd-2 is not healthy"
+	exit $STATE_CRITICAL
+fi
+HEALTH=$(      echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "Healthy" ]; then
+	echo "[CRIT] scheduler is not healthy"
+	exit $STATE_CRITICAL
+fi
+HEALTH=$(      echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "Healthy" ]; then
+	echo "[CRIT] controller-manager is not healthy"
 	exit $STATE_CRITICAL
 fi
 
@@ -72,12 +87,5 @@ then
 	exit $STATE_CRITICAL
 fi
 
-BAD_PODS=$( $KUBECTL get --all-namespaces po --no-headers=true | awk -F ' ' '{print $4}' | grep -v Running | grep -v Pending | grep -v Terminating | wc -l )
-if [ "$BAD_PODS" -gt "0" ]
-then
-	echo "[CRIT] $BAD_PODS pods are in a bad state"
-	exit $STATE_CRITICAL
-fi
-
-echo "[OK] all k8s-components, nodes and pods look healthy"
+echo "[OK] all k8s-components and nodes report a healthy state"
 exit $STATE_OK
