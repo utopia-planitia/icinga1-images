@@ -24,7 +24,7 @@ fi
 
 timeout 2 docker run --rm hello-world > /dev/null
 if [ $? -ne 0 ]; then
-        echo "[CRIT] docker pull failed"
+        echo "[CRIT] docker run failed"
         exit $STATE_CRITICAL
 fi
 

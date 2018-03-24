@@ -25,6 +25,7 @@ RUN curl -o /usr/lib/nagios/plugins/check_open_files "https://exchange.nagios.or
     chmod +x /usr/lib/nagios/plugins/check_open_files
 
 COPY check_docker /usr/lib/nagios/plugins/check_docker
+COPY check_registry /usr/lib/nagios/plugins/check_registry
 
 EXPOSE 5666
 
