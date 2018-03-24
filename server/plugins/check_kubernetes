@@ -17,12 +17,13 @@ REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
 #Function to print Usage
 function usage
 {
-echo "Usage: $0 -N [minimum number of nodes]"
+echo "Usage: $0 -s [apiserver endpoint] -n [minimum number of nodes]"
 exit $STATE_UNKNOWN
 }
 
 
 MINIMUM_NODE_COUNT=1
+APISERVER=https://kubernetes.default.svc
 #####################################################################
 # get parameter values in Variables
 
@@ -31,8 +32,12 @@ while test -n "$1"; do
          -h)
             usage
             ;;
-         -N)
+         -n)
             MINIMUM_NODE_COUNT=$2
+            shift
+            ;;
+         -s)
+            APISERVER=$2
             shift
             ;;
          *)
@@ -45,30 +50,35 @@ done
 
 #####################################################################
 
-STATUS=$( kubectl get cs )
+TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
+KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+
+STATUS=$( $KUBECTL get cs --no-headers=true )
 
 if [ "$STATUS" == "" ]; then
         echo "[CRIT] no answer"
         exit $STATE_CRITICAL
 fi
 
-ETCD_HEALTH=$(       echo "$STATUS" | grep etcd               | awk -F ' ' '{print $2}' )
+ETCD0_HEALTH=$(      echo "$STATUS" | grep etcd-0             | awk -F ' ' '{print $2}' )
+ETCD1_HEALTH=$(      echo "$STATUS" | grep etcd-1             | awk -F ' ' '{print $2}' )
+ETCD2_HEALTH=$(      echo "$STATUS" | grep etcd-2             | awk -F ' ' '{print $2}' )
 SCHEDULER_HEALTH=$(  echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
 CONTROLLER_HEALTH=$( echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
-if [ "$ETCD_HEALTH" == "Unhealthy" ] || [ "$SCHEDULER_HEALTH" == "Unhealthy" ] || [ "$CONTROLLER_HEALTH" == "Unhealthy" ]
+if [ "$ETCD0_HEALTH" != "Healthy" ] || [ "$ETCD1_HEALTH" != "Healthy" ] || [ "$ETCD2_HEALTH" != "Healthy" ] || [ "$SCHEDULER_HEALTH" != "Healthy" ] || [ "$CONTROLLER_HEALTH" != "Healthy" ]
 then
-	echo "[CRIT] etcd $ETCD_HEALTH, scheduler $SCHEDULER_HEALTH, controller-manager $CONTROLLER_HEALTH"
+	echo "[CRIT] etcd-0 $ETCD0_HEALTH, etcd-1 $ETCD1_HEALTH, etcd-2 $ETCD2_HEALTH, scheduler $SCHEDULER_HEALTH, controller-manager $CONTROLLER_HEALTH"
 	exit $STATE_CRITICAL
 fi
 
-NODES=$( kubectl get no | tail -n +2 | grep Ready | grep -v NotReady | wc -l )
+NODES=$( $KUBECTL get no --no-headers=true | wc -l )
 if [ "$NODES" -lt "$MINIMUM_NODE_COUNT" ]
 then
 	echo "[CRIT] only $NODES nodes Ready, $MINIMUM_NODE_COUNT desired"
 	exit $STATE_CRITICAL
 fi
 
-BAD_PODS=$( kubectl get --all-namespaces po | tail -n +2 | awk -F ' ' '{print $4}' | grep -v Running | grep -v Pending | grep -v Terminating | wc -l )
+BAD_PODS=$( $KUBECTL get --all-namespaces po --no-headers=true | awk -F ' ' '{print $4}' | grep -v Running | grep -v Pending | grep -v Terminating | wc -l )
 if [ "$BAD_PODS" -gt "0" ]
 then
 	echo "[CRIT] $BAD_PODS pods are in a bad state"
