@@ -14,6 +14,7 @@ RUN apt-get update && \
         curl \
         gcc python-dev python-pip smartmontools \
         sudo \
+        lm-sensors \
         && \
     rm -rf /var/lib/apt/lists/*
 

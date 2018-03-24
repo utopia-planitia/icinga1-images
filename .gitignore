@@ -6,6 +6,8 @@
 /.client
 /.client-deploy
 /.secrets
+/client/utils.sh
+/_old
 
 # PRODUCTION SETUP: remove these lines
 /client/ssl
