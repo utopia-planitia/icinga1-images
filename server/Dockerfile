@@ -41,10 +41,12 @@ RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 # kubernetes
 RUN curl -o /usr/bin/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && \
     chmod +x /usr/bin/kubectl
-ADD plugins/check_kubernetes      /usr/lib/nagios/plugins/
-COPY plugins/check_kubernetes.cfg /etc/nagios-plugins/config/
-ADD plugins/check_pods            /usr/lib/nagios/plugins/
-COPY plugins/check_pods.cfg       /etc/nagios-plugins/config/
+COPY plugins/check_kubernetes          /usr/lib/nagios/plugins/
+COPY plugins/check_kubernetes.cfg      /etc/nagios-plugins/config/
+COPY plugins/check_pods                /usr/lib/nagios/plugins/
+COPY plugins/check_pods.cfg            /etc/nagios-plugins/config/
+COPY plugins/check_ssl_certificate     /usr/lib/nagios/plugins/
+COPY plugins/check_ssl_certificate.cfg /etc/nagios-plugins/config/
 
 # cephfs
 COPY plugins/ceph/check_ceph_health /usr/lib/nagios/plugins/check_ceph_health

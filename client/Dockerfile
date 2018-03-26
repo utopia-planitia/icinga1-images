@@ -3,7 +3,7 @@ FROM docker:1.13.1 AS docker
 FROM lachlanevenson/k8s-kubectl:v1.5.7 AS kubectl
 
 FROM ubuntu:17.10
-COPY --from=docker  /usr/local/bin/docker /usr/local/bin/docker
+COPY --from=docker  /usr/local/bin/docker  /usr/local/bin/docker
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -18,17 +18,13 @@ RUN apt-get update && \
         && \
     rm -rf /var/lib/apt/lists/*
 
-RUN curl -o /usr/lib/nagios/plugins/check_smartmon https://raw.githubusercontent.com/nihlaeth/Nagios_check_smartmon/master/check_smartmon.py && \
-    chmod +x /usr/lib/nagios/plugins/check_smartmon && \
-    pip install psutil
-
-RUN curl -o /usr/lib/nagios/plugins/check_open_files "https://exchange.nagios.org/components/com_mtree/attachment.php?link_id=3328&cf_id=24" && \
-    chmod +x /usr/lib/nagios/plugins/check_open_files
-
-COPY check_docker /usr/lib/nagios/plugins/check_docker
-COPY check_registry /usr/lib/nagios/plugins/check_registry
-COPY check_memory /usr/lib/nagios/plugins/check_memory
-COPY check_swap /usr/lib/nagios/plugins/check_swap
+COPY check_smartmon   /usr/lib/nagios/plugins/
+RUN pip install psutil
+COPY check_open_files /usr/lib/nagios/plugins/
+COPY check_docker     /usr/lib/nagios/plugins/
+COPY check_registry   /usr/lib/nagios/plugins/
+COPY check_memory     /usr/lib/nagios/plugins/
+COPY check_swap       /usr/lib/nagios/plugins/
 
 EXPOSE 5666
 
