@@ -1,11 +1,11 @@
 
 .server-deploy: .server kubernetes/server.yaml
-	kubectl apply -f kubernetes/server.yaml
+	kubectl apply -f kubernetes/minikube/server.yaml
 	kubectl -n alerting delete po -l app=server
 	touch .server-deploy
 
 .client-deploy: .client kubernetes/client.yaml
-	kubectl apply -f kubernetes/client.yaml
+	kubectl apply -f kubernetes/minikube/client.yaml
 	kubectl -n alerting delete po -l app=client
 	touch .client-deploy
 
