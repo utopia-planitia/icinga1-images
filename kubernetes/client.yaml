@@ -1,10 +1,12 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: DaemonSet
 metadata:
   name: client
   namespace: alerting
 spec:
-  replicas: 1
+  selector:
+    matchLabels:
+      app: client
   template:
     metadata:
       labels:
