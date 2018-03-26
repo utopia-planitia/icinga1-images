@@ -3,8 +3,10 @@
 /.devtools-deploy
 /.server
 /.server-deploy
+/.server-pushed
 /.client
 /.client-deploy
+/.client-pushed
 /.secrets
 /client/utils.sh
 /server/plugins/utils.sh

@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: server
+  namespace: alerting
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          image: ${SERVER_IMAGE}
+          ports:
+            - containerPort: 80
+              name: http
+          livenessProbe:
+            tcpSocket:
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: server
+  namespace: alerting
+spec:
+  ports:
+    - port: 80
+  selector:
+    app: server
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: server
+  namespace: alerting
+spec:
+  rules:
+  - host: alerting.domain.tld
+    http:
+      paths:
+      - backend:
+          serviceName: server
+          servicePort: 80
+        path: /

@@ -4,8 +4,10 @@
         ".devtools-deploy": true,
         ".server": true,
         ".server-deploy": true,
+        ".server-pushed": true,
         ".client": true,
         ".client-deploy": true,
+        ".client-pushed": true,
         "*.log": true
     }
 }
