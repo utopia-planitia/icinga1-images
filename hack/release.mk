@@ -1,7 +1,9 @@
 
 export TAG=latest
-export CLIENT_IMAGE="registry/alerting/client:${TAG}"
-export SERVER_IMAGE="registry/alerting/server:${TAG}"
+export CLIENT_IMAGE_PUSH="registry/alerting/client:${TAG}"
+export CLIENT_IMAGE_PULL="registry/alerting/client:${TAG}"
+export SERVER_IMAGE_PUSH="registry/alerting/server:${TAG}"
+export SERVER_IMAGE_PULL="registry/alerting/server:${TAG}"
 KUBECTL ?= kubectl
 
 .PHONY: release
