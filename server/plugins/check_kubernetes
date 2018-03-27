@@ -80,7 +80,7 @@ if [ "$HEALTH" != "Healthy" ]; then
 	exit $STATE_CRITICAL
 fi
 
-NODES=$( $KUBECTL get no --no-headers=true | wc -l )
+NODES=$( $KUBECTL get no --no-headers=true | grep -v NotReady | wc -l )
 if [ "$NODES" -lt "$MINIMUM_NODE_COUNT" ]
 then
 	echo "[CRIT] only $NODES nodes Ready, $MINIMUM_NODE_COUNT desired"
