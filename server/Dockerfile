@@ -1,4 +1,7 @@
+FROM lachlanevenson/k8s-kubectl:v1.9.6 AS kubectl
+
 FROM ubuntu:17.10
+COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -39,8 +42,6 @@ COPY plugins/dsa-check-port-closed /usr/lib/nagios/plugins/check_port_closed
 RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 
 # kubernetes
-RUN curl -o /usr/bin/kubectl -L https://storage.googleapis.com/kubernetes-release/release/v1.9.0/bin/linux/amd64/kubectl && \
-    chmod +x /usr/bin/kubectl
 COPY plugins/check_kubernetes          /usr/lib/nagios/plugins/
 COPY plugins/check_kubernetes.cfg      /etc/nagios-plugins/config/
 COPY plugins/check_pods                /usr/lib/nagios/plugins/
