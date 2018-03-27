@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: ${SERVER_IMAGE}
+          image: ${SERVER_IMAGE_PULL}
           ports:
             - containerPort: 80
               name: http

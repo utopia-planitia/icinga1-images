@@ -1,5 +1,5 @@
 
-export TAG=$(shell date +%s)
+export TAG=latest
 export CLIENT_IMAGE="registry/alerting/client:${TAG}"
 export SERVER_IMAGE="registry/alerting/server:${TAG}"
 KUBECTL ?= kubectl
@@ -10,19 +10,19 @@ release: .client-pushed .server-pushed ##@release Build and push the images.
 
 .PHONY: apply
 apply: ##@release Apply monitoring to the cluster.
-	cat kubernetes/release/namespace.yaml | envsubst | $(KUBECTL) --context=matrix apply -f -
-	cat kubernetes/release/client.yaml | envsubst | $(KUBECTL) --context=matrix apply -f -
-	cat kubernetes/release/server.yaml | envsubst | $(KUBECTL) --context=matrix apply -f -
-	$(KUBECTL) --context=matrix -n alerting delete po --all
+	cat kubernetes/release/namespace.yaml | envsubst | $(KUBECTL) apply -f -
+	cat kubernetes/release/client.yaml | envsubst | $(KUBECTL) apply -f -
+	cat kubernetes/release/server.yaml | envsubst | $(KUBECTL) apply -f -
+	$(KUBECTL) -n alerting delete po --all
 
 .PHONY: .client-pushed
 .client-pushed: .client
-	docker tag utopiaplanitia/alerting-client:latest ${CLIENT_IMAGE}
-	docker push ${CLIENT_IMAGE}
+	docker tag utopiaplanitia/alerting-client:latest ${CLIENT_IMAGE_PUSH}
+	docker push ${CLIENT_IMAGE_PUSH}
 	touch .client-pushed
 
 .PHONY: .server-pushed
 .server-pushed: .server
-	docker tag utopiaplanitia/alerting-server:latest ${SERVER_IMAGE}
-	docker push ${SERVER_IMAGE}
+	docker tag utopiaplanitia/alerting-server:latest ${SERVER_IMAGE_PUSH}
+	docker push ${SERVER_IMAGE_PUSH}
 	touch .server-pushed
