@@ -31,35 +31,23 @@ RUN sed -i 's/#default_user_name=guest/default_user_name=icingaadmin/g' /etc/ici
 
 RUN echo "nagios          ALL=(ALL) NOPASSWD: /usr/lib/nagios/plugins/" >> /etc/sudoers
 
-RUN apt-get update && \
-    apt-get -y install --no-install-recommends nmap ceph-common && \
-    rm -rf /var/lib/apt/lists/* && \
-    gpasswd -a www-data nagios
-
 # port closed check
 # from http://anonscm.debian.org/cgit/mirror/dsa-nagios.git/plain/dsa-nagios-checks/checks/dsa-check-port-closed
 COPY plugins/dsa-check-port-closed /usr/lib/nagios/plugins/check_port_closed
 RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 
-# kubernetes
+# plugins
+COPY plugins/check_nrpe.cfg            /etc/nagios-plugins/config/
 COPY plugins/check_kubernetes          /usr/lib/nagios/plugins/
 COPY plugins/check_kubernetes.cfg      /etc/nagios-plugins/config/
 COPY plugins/check_pods                /usr/lib/nagios/plugins/
 COPY plugins/check_pods.cfg            /etc/nagios-plugins/config/
 COPY plugins/check_ssl_certificate     /usr/lib/nagios/plugins/
 COPY plugins/check_ssl_certificate.cfg /etc/nagios-plugins/config/
-
-# cephfs
-COPY plugins/ceph/check_ceph_health /usr/lib/nagios/plugins/check_ceph_health
-COPY plugins/ceph/check_ceph_mon /usr/lib/nagios/plugins/check_ceph_mon
-COPY plugins/ceph/check_ceph_osd /usr/lib/nagios/plugins/check_ceph_osd
-COPY plugins/ceph/check_ceph_rgw /usr/lib/nagios/plugins/check_ceph_rgw
-COPY plugins/ceph/check_ceph_mds /usr/lib/nagios/plugins/check_ceph_mds
-RUN chmod +x /usr/lib/nagios/plugins/check_ceph_*
+COPY plugins/check_ceph                /usr/lib/nagios/plugins/
+COPY plugins/check_ceph.cfg            /etc/nagios-plugins/config/
 
 RUN rm -rf /etc/icinga/objects
 COPY objects /etc/icinga/objects
 
 COPY ssl /ssl
-
-COPY plugins/check_nrpe.cfg       /etc/nagios-plugins/config/

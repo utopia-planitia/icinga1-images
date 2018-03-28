@@ -65,7 +65,7 @@ KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run
 STATUS=$( $KUBECTL version )
 if [ "$STATUS" == "" ]; then
         echo "[UNKNOWN] no answer"
-        exit $STATE_STATE_UNKNOWN
+        exit $STATE_UNKNOWN
 fi
 
 ALL_PODS=$( $KUBECTL --all-namespaces=true get po --no-headers=true )
