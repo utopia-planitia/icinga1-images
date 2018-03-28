@@ -13,6 +13,7 @@ release: .client-pushed .server-pushed ##@release Build and push the images.
 .PHONY: apply
 apply: ##@release Apply monitoring to the cluster.
 	cat kubernetes/release/namespace.yaml | envsubst | $(KUBECTL) apply -f -
+	cat kubernetes/release/rbac.yaml | envsubst | $(KUBECTL) apply -f -
 	cat kubernetes/release/client.yaml | envsubst | $(KUBECTL) apply -f -
 	cat kubernetes/release/server.yaml | envsubst | $(KUBECTL) apply -f -
 	$(KUBECTL) -n alerting delete po --all

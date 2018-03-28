@@ -10,6 +10,7 @@ spec:
       labels:
         app: server
     spec:
+      serviceAccountName: alerting-server
       containers:
         - name: server
           image: ${SERVER_IMAGE_PULL}
