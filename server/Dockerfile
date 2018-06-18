@@ -1,4 +1,4 @@
-FROM lachlanevenson/k8s-kubectl:v1.9.6 AS kubectl
+FROM lachlanevenson/k8s-kubectl:v1.10.3 AS kubectl
 
 FROM ubuntu:17.10
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
