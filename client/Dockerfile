@@ -43,5 +43,4 @@ RUN sed -i 's/#ssl_cert_file=\/etc\/ssl\/servercerts\/nagios-cert.pem/ssl_cert_f
 RUN sed -i 's/#ssl_privatekey_file=\/etc\/ssl\/servercerts\/nagios-key.pem/ssl_privatekey_file=\/ssl\/client_cert.key/g' /etc/nagios/nrpe.cfg
 RUN sed -i 's/#ssl_client_certs=0/ssl_client_certs=2/g' /etc/nagios/nrpe.cfg
 
-COPY ssl /ssl
 COPY nrpe_local.cfg /etc/nagios/nrpe_local.cfg
