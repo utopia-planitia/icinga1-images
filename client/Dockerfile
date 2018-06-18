@@ -2,7 +2,7 @@ FROM docker:17.03.2-ce AS docker
 
 FROM lachlanevenson/k8s-kubectl:v1.10.3 AS kubectl
 
-FROM ubuntu:17.10
+FROM ubuntu:18.04
 COPY --from=docker  /usr/local/bin/docker  /usr/local/bin/docker
 COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
