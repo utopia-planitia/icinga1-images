@@ -70,7 +70,7 @@ fi
 
 ALL_PODS=$( $KUBECTL --all-namespaces=true get po --no-headers=true )
 
-NOT_RUNNING=$( echo "$ALL_PODS" | grep -v Running | grep -v Running | grep -v Terminating | grep -v ContainerCreating | wc -l )
+NOT_RUNNING=$( echo "$ALL_PODS" | grep -v Running | grep -v Completed | grep -v Terminating | grep -v ContainerCreating | wc -l )
 if [ "$NOT_RUNNING" -ge "$NOT_RUNNING_WARN" ]; then
 	echo "[WARN] $NOT_RUNNING pods are not running"
 	exit $STATE_WARNING
@@ -82,7 +82,7 @@ fi
 
 INCOMPLETE_PODS=$( echo "$ALL_PODS" | grep Running | awk -F ' ' '{print $3}' | awk -F / '{  print ($1 == $2) ? "full" : "incomplete" }' | grep incomplete | wc -l )
 if [ "$INCOMPLETE_PODS" -ge "$INCOMPLETE_WARN" ]; then
-	echo "[CRIT] $INCOMPLETE_PODS pods are in a incomplete state"
+	echo "[WARN] $INCOMPLETE_PODS pods are in a incomplete state"
 	exit $STATE_WARNING
 fi
 if [ "$INCOMPLETE_PODS" -ge "$INCOMPLETE_CRIT" ]; then
