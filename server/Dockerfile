@@ -40,7 +40,6 @@ RUN chmod +x /usr/lib/nagios/plugins/check_port_closed
 # plugins
 COPY plugins/check_nrpe.cfg            /etc/nagios-plugins/config/
 COPY plugins/check_kubernetes          /usr/lib/nagios/plugins/
-COPY plugins/check_kubernetes.cfg      /etc/nagios-plugins/config/
 COPY plugins/check_pods                /usr/lib/nagios/plugins/
 COPY plugins/check_pods.cfg            /etc/nagios-plugins/config/
 COPY plugins/check_ssl_certificate     /usr/lib/nagios/plugins/
