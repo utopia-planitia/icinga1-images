@@ -68,7 +68,7 @@ if [ "$STATUS" == "" ]; then
         exit $STATE_UNKNOWN
 fi
 
-ALL_PODS=$( $KUBECTL --all-namespaces=true get po --no-headers=true )
+ALL_PODS=$( $KUBECTL --all-namespaces=true get po --no-headers=true | grep -v -e '^ci\-' | grep -v '\-ci\-'  )
 
 NOT_RUNNING=$( echo "$ALL_PODS" | grep -v Running | grep -v Completed | grep -v Terminating | grep -v ContainerCreating | wc -l )
 if [ "$NOT_RUNNING" -ge "$NOT_RUNNING_WARN" ]; then
