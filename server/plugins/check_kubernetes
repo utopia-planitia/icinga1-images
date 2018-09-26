@@ -47,11 +47,14 @@ done
 TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
-STATUS=$( $KUBECTL get cs --no-headers=true )
-
-if [ "$STATUS" == "" ]; then
-        echo "[CRIT] no answer"
+STATUS=$( $KUBECTL get cs --no-headers=true 2>&1 )
+if [ $? -ne 0 ]; then
+        echo "[ERR] failed to connect to ceph: $STATUS"
         exit $STATE_CRITICAL
+fi
+if [ "$STATUS" == "" ]; then
+        echo "[UNKNOWN] no answer"
+        exit $STATE_UNKNOWN
 fi
 
 HEALTH=$(      echo "$STATUS" | grep etcd-0             | awk -F ' ' '{print $2}' )
