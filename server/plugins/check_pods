@@ -64,7 +64,7 @@ KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run
 
 STATUS=$( $KUBECTL version 2>&1 )
 if [ $? -ne 0 ]; then
-        echo "[ERR] failed to connect to ceph: $STATUS"
+        echo "[ERR] failed to connect to apiserver: $STATUS"
         exit $STATE_CRITICAL
 fi
 if [ "$STATUS" == "" ]; then
