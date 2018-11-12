@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# 
+# Check systemd services are running
+# 
+# Usage: $0 
+#
+#Nagios exit codes
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
+ 
+SERVICE=$1
+ 
+# Check service status
+ 
+systemctl -t service | grep failed | awk ‘{print $2}’
+if [[ $? -ne 0 ]]; then
+    echo "ERROR: service $SERVICE is not running"
+    exit $CRITICAL
+fi
+ 
+echo "OK: service $SERVICE is running"
+exit $OK
