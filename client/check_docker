@@ -28,6 +28,12 @@ if [ $? -ne 0 ]; then
         exit $STATE_CRITICAL
 fi
 
+timeout 2 docker ps -a | wc -l > /dev/null
+if [ $? >1000 ]; then
+        echo "[CRIT] docker ps over 1000 Pods"
+        exit $STATE_CRITICAL
+fi
+
 
 echo "[OK] - docker version, ps, pull and run succeeded"
 exit $STATE_OK
