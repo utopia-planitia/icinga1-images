@@ -53,7 +53,7 @@ done
 
 shift $((OPTIND-1))
 
-array=( $(cat /proc/meminfo | egrep 'MemTotal|MemFree|Buffers|Cached|SwapTotal|SwapFree' |awk '{print $1 " " $2}' |tr '\n' ' ' |tr -d ':' |awk '{ printf("%i %i %i %i %i %i %i", $2, $4, $6, $8, $10, $12, $14) }') )
+array=( $(cat /proc/meminfo | egrep 'MemTotal|MemAvailable|Buffers|Cached|SwapTotal|SwapFree' |awk '{print $1 " " $2}' |tr '\n' ' ' |tr -d ':' |awk '{ printf("%i %i %i %i %i %i %i", $2, $4, $6, $8, $10, $12, $14) }') )
 
 memTotal_k=${array[0]}
 memTotal_b=$(($memTotal_k*1024))
