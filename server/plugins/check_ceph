@@ -16,7 +16,7 @@ exit $STATE_UNKNOWN
 }
 
 APISERVER=https://kubernetes.default.svc
-NAMESPACE=rook
+NAMESPACE=rook-ceph
 OSD_COUNT=8
 DF_WARN=80
 DF_CRIT=90
@@ -61,7 +61,13 @@ done
 TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
-STATUS=$( $KUBECTL -n $NAMESPACE exec rook-tools ceph status 2>&1 )
+POD=$( $KUBECTL -n $NAMESPACE get pod -l app=rook-ceph-tools -o jsonpath="{.items[0].metadata.name}" 2>&1 )
+if [ $? -ne 0 ]; then
+        echo "[UNKNOWN] failed to find to ceph tools pod"
+        exit $STATE_UNKNOWN
+fi
+
+STATUS=$( $KUBECTL -n $NAMESPACE exec $POD ceph status 2>&1 )
 if [ $? -ne 0 ]; then
         echo "[ERR] failed to connect to ceph: $STATUS"
         exit $STATE_CRITICAL
