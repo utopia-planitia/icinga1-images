@@ -22,7 +22,7 @@ if [ $? -ne 0 ]; then
         exit $STATE_CRITICAL
 fi
 
-timeout 2 docker run --rm hello-world > /dev/null
+timeout 4 docker run --rm hello-world > /dev/null
 if [ $? -ne 0 ]; then
         echo "[CRIT] docker run failed"
         exit $STATE_CRITICAL
