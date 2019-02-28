@@ -11,7 +11,7 @@ REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
 #Function to print Usage
 function usage
 {
-echo "Usage: $0 -s [apiserver endpoint] -n [minimum number of nodes]"
+echo "Usage: $0 -s [apiserver endpoint] -o [minimum number of OSDs]"
 exit $STATE_UNKNOWN
 }
 
