@@ -18,8 +18,8 @@ exit $STATE_UNKNOWN
 APISERVER=https://kubernetes.default.svc
 NAMESPACE=rook-ceph
 OSD_COUNT=8
-DF_WARN=80
-DF_CRIT=90
+DF_WARN=50
+DF_CRIT=70
 #####################################################################
 # get parameter values in Variables
 
@@ -67,7 +67,9 @@ if [ $? -ne 0 ]; then
         exit $STATE_UNKNOWN
 fi
 
-STATUS=$( $KUBECTL -n $NAMESPACE exec $POD ceph status 2>&1 )
+EXEC="$KUBECTL -n $NAMESPACE exec $POD"
+
+STATUS=$( $EXEC ceph status 2>&1 )
 if [ $? -ne 0 ]; then
         echo "[ERR] failed to connect to ceph: $STATUS"
         exit $STATE_CRITICAL
@@ -77,7 +79,7 @@ if [ "$STATUS" == "" ]; then
         exit $STATE_UNKNOWN
 fi
 
-HEALTH=$( echo "$STATUS" | head -n 3 | tail -n 1 | awk '{print $2}' )
+HEALTH=$( echo "$STATUS" | grep "health:" | awk '{print $2}' )
 if [ "$HEALTH" == "HEALTH_ERR" ]; then
         echo "[ERR] ceph monitor defines a severe problem"
         exit $STATE_CRITICAL
@@ -87,16 +89,13 @@ if [ "$HEALTH" == "HEALTH_WARN" ]; then
         exit $STATE_WARNING
 fi
 
-# debugging example:
-#OSDS=$( $KUBECTL -n $NAMESPACE exec $POD ceph osd stat 2>&1 )
-#if [ ! "$OSDS" == "$OSD_COUNT osds: $OSD_COUNT up, $OSD_COUNT in" ]; then
-OSDS=$( echo "$STATUS" | head -n 9 | tail -n 1 )
+OSDS=$( echo "$STATUS" | grep "osd:" )
 if [ ! "$OSDS" == "    osd: $OSD_COUNT osds: $OSD_COUNT up, $OSD_COUNT in" ]; then
         echo "[ERR] ceph does not have $OSD_COUNT storage nodes"
         exit $STATE_CRITICAL
 fi
 
-USED=$( $KUBECTL -n $NAMESPACE exec rook-tools ceph df | head -n 3 | tail -n 1 | awk '{print $4}')
+USED=$( $EXEC ceph df | head -n 3 | tail -n 1 | awk '{print $7}')
 if (( $(echo "$USED > $DF_CRIT" | bc -l) )); then
         echo "[ERR] $FREE% is space is used"
         exit $STATE_CRITICAL
