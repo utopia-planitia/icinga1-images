@@ -17,7 +17,7 @@ exit $STATE_UNKNOWN
 
 APISERVER=https://kubernetes.default.svc
 NAMESPACE=rook-ceph
-OSD_COUNT=8
+OSD_COUNT=4
 DF_WARN=50
 DF_CRIT=70
 #####################################################################
@@ -89,13 +89,24 @@ if [ "$HEALTH" == "HEALTH_WARN" ]; then
         exit $STATE_WARNING
 fi
 
-OSDS=$( echo "$STATUS" | grep "osd:" )
-if [ ! "$OSDS" == "    osd: $OSD_COUNT osds: $OSD_COUNT up, $OSD_COUNT in" ]; then
+OSDS=$( echo "$STATUS" | grep "osd" )
+echo "$OSDS" | grep " osd: $OSD_COUNT " > /dev/null
+if [ $? -ne 0 ]; then
         echo "[ERR] ceph does not have $OSD_COUNT storage nodes"
         exit $STATE_CRITICAL
 fi
+echo "$OSDS" | grep " osds: $OSD_COUNT up" > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[ERR] ceph does not have $OSD_COUNT storage nodes up"
+        exit $STATE_CRITICAL
+fi
+echo "$OSDS" | grep " $OSD_COUNT in" > /dev/null
+if [ $? -ne 0 ]; then
+        echo "[ERR] ceph does not have $OSD_COUNT storage nodes in"
+        exit $STATE_CRITICAL
+fi
 
-USED=$( $EXEC ceph df | head -n 3 | tail -n 1 | awk '{print $7}')
+USED=$( $EXEC ceph df | head -n 3 | tail -n 1 | awk '{print $10}')
 if (( $(echo "$USED > $DF_CRIT" | bc -l) )); then
         echo "[ERR] $FREE% is space is used"
         exit $STATE_CRITICAL
