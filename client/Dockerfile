@@ -1,10 +1,4 @@
-FROM docker:17.03.2-ce AS docker
-
-FROM lachlanevenson/k8s-kubectl:v1.10.3 AS kubectl
-
 FROM ubuntu:18.04
-COPY --from=docker  /usr/local/bin/docker  /usr/local/bin/docker
-COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -21,8 +15,6 @@ RUN apt-get update && \
 COPY check_smartmon   /usr/lib/nagios/plugins/
 RUN pip install psutil
 COPY check_open_files /usr/lib/nagios/plugins/
-COPY check_docker     /usr/lib/nagios/plugins/
-COPY check_registry   /usr/lib/nagios/plugins/
 COPY check_memory     /usr/lib/nagios/plugins/
 COPY check_swap       /usr/lib/nagios/plugins/
 
