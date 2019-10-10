@@ -72,26 +72,31 @@ if [ "$STATUS" == "" ]; then
         exit $STATE_UNKNOWN
 fi
 
+OLD=$( tempfile )
+NEW=$( tempfile )
+curl --silent --fail 'http://metrics-prometheus-operato-prometheus.metrics.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~"ci",phase=~"Pending|Unknown|Terminating"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${OLD}
+curl --silent --fail 'http://metrics-prometheus-operato-prometheus.metrics.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~"ci",phase=~"Pending|Unknown|Terminating"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${NEW}
+NOT_RUNNING=$( cat ${OLD} ${NEW} | sort | uniq -c | awk '{ if ($1 >= 2) print $2 }' )
+NOT_RUNNING_COUNT=$( echo -n "$NOT_RUNNING" | wc -l )
+rm ${OLD} ${NEW}
+if [ "$NOT_RUNNING_COUNT" -ge "$NOT_RUNNING_WARN" ]; then
+        echo "[WARN] $NOT_RUNNING pods are not running: $NOT_RUNNING"
+        exit $STATE_WARNING
+fi
+if [ "$NOT_RUNNING_COUNT" -ge "$NOT_RUNNING_CRIT" ]; then
+        echo "[CRIT] $NOT_RUNNING pods are not running: $NOT_RUNNING"
+        exit $STATE_CRITICAL
+fi
+
 ALL_PODS=$( $KUBECTL --all-namespaces=true get po --no-headers=true | grep -v -e '^ci\-' | grep -v '\-ci\-'  )
-
-NOT_RUNNING=$( echo "$ALL_PODS" | grep -v Running | grep -v Completed | grep -v Terminating | grep -v ContainerCreating | wc -l )
-if [ "$NOT_RUNNING" -ge "$NOT_RUNNING_WARN" ]; then
-	echo "[WARN] $NOT_RUNNING pods are not running"
-	exit $STATE_WARNING
-fi
-if [ "$NOT_RUNNING" -ge "$NOT_RUNNING_CRIT" ]; then
-	echo "[CRIT] $NOT_RUNNING pods are not running"
-	exit $STATE_CRITICAL
-fi
-
-INCOMPLETE_PODS=$( echo "$ALL_PODS" | grep Running | awk -F ' ' '{print $3}' | awk -F / '{  print ($1 == $2) ? "full" : "incomplete" }' | grep incomplete | wc -l )
+INCOMPLETE_PODS=$( echo "$ALL_PODS" | grep Running | awk -F ' ' '{print $3}' | awk -F / '{ if ($1 != $2) print "incomplete" }' | wc -l )
 if [ "$INCOMPLETE_PODS" -ge "$INCOMPLETE_WARN" ]; then
-	echo "[WARN] $INCOMPLETE_PODS pods are in a incomplete state"
-	exit $STATE_WARNING
+        echo "[WARN] $INCOMPLETE_PODS pods are in a incomplete state"
+        exit $STATE_WARNING
 fi
 if [ "$INCOMPLETE_PODS" -ge "$INCOMPLETE_CRIT" ]; then
-	echo "[CRIT] $INCOMPLETE_PODS pods are in a incomplete state"
-	exit $STATE_CRITICAL
+        echo "[CRIT] $INCOMPLETE_PODS pods are in a incomplete state"
+        exit $STATE_CRITICAL
 fi
 
 echo "[OK] all pods look healthy"

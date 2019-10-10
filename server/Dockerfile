@@ -12,6 +12,7 @@ RUN apt-get update && \
         icinga icinga-doc nagios-plugins nagios-nrpe-plugin \
         curl nano \
         bc \
+        jq \
         sudo && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
