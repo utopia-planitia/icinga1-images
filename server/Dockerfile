@@ -1,7 +1,4 @@
-FROM lachlanevenson/k8s-kubectl:v1.10.3 AS kubectl
-
 FROM ubuntu:18.04
-COPY --from=kubectl /usr/local/bin/kubectl /usr/local/bin/kubectl
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
@@ -16,6 +13,9 @@ RUN apt-get update && \
         sudo && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
+
+RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.13.11/bin/linux/amd64/kubectl && \
+    chmod +x /usr/local/bin/kubectl
 
 EXPOSE 80
 
