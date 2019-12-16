@@ -14,7 +14,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
-RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.16.4/bin/linux/amd64/kubectl && \
+# downgrade kubectl to 1.15 with 1.16 apiserver because of
+# https://github.com/kubernetes/kubectl/issues/762
+# https://github.com/kubernetes/kubernetes/issues/83024
+RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.15.7/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 EXPOSE 80
