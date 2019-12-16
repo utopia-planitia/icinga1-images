@@ -62,16 +62,6 @@ if [ "$HEALTH" != "Healthy" ]; then
 	echo "[CRIT] etcd-0 is not healthy"
 	exit $STATE_CRITICAL
 fi
-HEALTH=$(      echo "$STATUS" | grep etcd-1             | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] etcd-1 is not healthy"
-	exit $STATE_CRITICAL
-fi
-HEALTH=$(      echo "$STATUS" | grep etcd-2             | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] etcd-2 is not healthy"
-	exit $STATE_CRITICAL
-fi
 HEALTH=$(      echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
 if [ "$HEALTH" != "Healthy" ]; then
 	echo "[CRIT] scheduler is not healthy"
