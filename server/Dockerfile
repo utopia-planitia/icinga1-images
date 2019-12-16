@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
-RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.13.11/bin/linux/amd64/kubectl && \
+RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.16.4/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 EXPOSE 80
