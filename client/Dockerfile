@@ -30,9 +30,4 @@ RUN sed -i 's/# command_prefix=\/usr\/bin\/sudo/command_prefix=\/usr\/bin\/sudo/
 
 CMD ["/usr/sbin/nrpe", "-c", "/etc/nagios/nrpe.cfg", "-f"]
 
-RUN sed -i 's/#ssl_cacert_file=\/etc\/ssl\/servercerts\/ca-cert.pem/ssl_cacert_file=\/ssl\/ca_cert.pem/g' /etc/nagios/nrpe.cfg
-RUN sed -i 's/#ssl_cert_file=\/etc\/ssl\/servercerts\/nagios-cert.pem/ssl_cert_file=\/ssl\/client_cert.pem/g' /etc/nagios/nrpe.cfg
-RUN sed -i 's/#ssl_privatekey_file=\/etc\/ssl\/servercerts\/nagios-key.pem/ssl_privatekey_file=\/ssl\/client_cert.key/g' /etc/nagios/nrpe.cfg
-RUN sed -i 's/#ssl_client_certs=0/ssl_client_certs=2/g' /etc/nagios/nrpe.cfg
-
 COPY nrpe_local.cfg /etc/nagios/nrpe_local.cfg
