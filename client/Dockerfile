@@ -20,6 +20,10 @@ COPY check_swap       /usr/lib/nagios/plugins/
 
 EXPOSE 5666
 
+RUN apt-get update
+RUN apt-get install -y nvme-cli
+COPY check_nvme       /usr/lib/nagios/plugins/
+
 RUN sed -i 's/#log_file=\/var\/log\/nrpe.log/log_file=\/var\/log\/nrpe.log/g' /etc/nagios/nrpe.cfg
 RUN sed -i 's/allowed_hosts=127.0.0.1,::1/#allowed_hosts=127.0.0.1,::1/g' /etc/nagios/nrpe.cfg
 RUN sed -i 's/pid_file=\/var\/run\/nagios\/nrpe.pid/#pid_file=\/var\/run\/nagios\/nrpe.pid/g' /etc/nagios/nrpe.cfg
