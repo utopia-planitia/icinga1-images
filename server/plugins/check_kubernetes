@@ -72,16 +72,19 @@ if [ "$HEALTH" != "Healthy" ]; then
 	echo "[CRIT] etcd-2 is not healthy"
 	exit $STATE_CRITICAL
 fi
-HEALTH=$(      echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] scheduler is not healthy"
-	exit $STATE_CRITICAL
-fi
-HEALTH=$(      echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] controller-manager is not healthy"
-	exit $STATE_CRITICAL
-fi
+
+# https://github.com/kubernetes/kubeadm/issues/2222
+# https://github.com/kubernetes/enhancements/issues/553
+#HEALTH=$(      echo "$STATUS" | grep scheduler          | awk -F ' ' '{print $2}' )
+#if [ "$HEALTH" != "Healthy" ]; then
+#	echo "[CRIT] scheduler is not healthy"
+#	exit $STATE_CRITICAL
+#fi
+#HEALTH=$(      echo "$STATUS" | grep controller-manager | awk -F ' ' '{print $2}' )
+#if [ "$HEALTH" != "Healthy" ]; then
+#	echo "[CRIT] controller-manager is not healthy"
+#	exit $STATE_CRITICAL
+#fi
 
 NODES=$( $KUBECTL get no --no-headers=true | grep -v NotReady | wc -l )
 if [ "$NODES" -lt "$MINIMUM_NODE_COUNT" ]
