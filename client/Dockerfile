@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
     apt-get -y install \
         nagios-nrpe-server \
+        nano \
         monitoring-plugins \
         curl \
         gcc python-dev python-pip smartmontools \
