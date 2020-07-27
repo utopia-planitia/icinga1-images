@@ -78,6 +78,11 @@ value_data_units_read=$(echo "$LOG" | awk '$1 == "data_units_read" {print $3}')
 
 PERFDATA="media_errors=${value_media_errors} errors=${value_num_err_log} temperature=${value_temperature} available_spare=${value_available_spare} data_units_written=${value_data_units_written}c data_units_read=${value_data_units_read}c"
 
+if [ $value_available_spare != "100%"  ]; then
+  echo "CRITICAL: on disk ${DISK} spare capacity is used: ${PERFDATA}"
+  exit 2
+fi
+
 if [ $CRIT = "true" ]; then
   echo "CRITICAL: ${MESSAGE}|${PERFDATA}"
   exit 2
