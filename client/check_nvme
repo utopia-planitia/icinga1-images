@@ -45,6 +45,7 @@ fi
 
 # read smart information from nvme-cli
 LOG=$(nvme smart-log ${DISK})
+ERROR_LOG=$(nvme error-log ${DISK})
 
 MESSAGE=""
 CRIT=false
@@ -64,7 +65,7 @@ if [ $value_media_errors != 0 ]; then
 fi
 
 # Check number of errors logged
-value_num_err_log=$(echo "$LOG" | awk '$1 == "num_err_log_entries" {print $3}')
+value_num_err_log=$(echo "$ERROR_LOG" | grep ": " | grep -v ": 0" | wc -l)
 if [ $value_num_err_log != 0 ]; then
   CRIT=true
   MESSAGE="$MESSAGE $DISK has errors logged ($value_num_err_log) "
