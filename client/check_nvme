@@ -45,7 +45,6 @@ fi
 
 # read smart information from nvme-cli
 LOG=$(nvme smart-log ${DISK})
-ERROR_LOG=$(nvme error-log ${DISK})
 
 MESSAGE=""
 CRIT=false
@@ -64,14 +63,8 @@ if [ $value_media_errors != 0 ]; then
   MESSAGE="$MESSAGE $DISK has media errors ($value_media_errors) "
 fi
 
-# Check number of errors logged
-value_num_err_log=$(echo "$ERROR_LOG" | grep ": " | grep -v ": 0" | wc -l)
-if [ $value_num_err_log != 0 ]; then
-  CRIT=true
-  MESSAGE="$MESSAGE $DISK has errors logged ($value_num_err_log) "
-fi
-
 # Read more data to output as performance data later on
+value_num_err_log=$(echo "$LOG" | awk '$1 == "num_err_log_entries" {print $3}')
 value_temperature=$(echo "$LOG" | awk '$1 == "temperature" {print $3}')
 value_available_spare=$(echo "$LOG" | awk '$1 == "available_spare" {print $3}')
 value_available_spare_threshold=$(echo "$LOG" | awk '$1 == "available_spare_threshold" {print $3}')
@@ -81,7 +74,7 @@ value_data_units_read=$(echo "$LOG" | awk '$1 == "data_units_read" {print $3}')
 percent_available_spare="${value_available_spare//%}"
 percent_available_spare_threshold="${value_available_spare_threshold//%}"
 
-PERFDATA="media_errors=${value_media_errors} errors=${value_num_err_log} temperature=${value_temperature} available_spare=${value_available_spare} value_available_spare_threshold=${value_available_spare_threshold} data_units_written=${value_data_units_written}c data_units_read=${value_data_units_read}c"
+PERFDATA="media_errors=${value_media_errors} errors=${value_num_err_log} temperature=${value_temperature} available_spare=${value_available_spare} value_available_spare_threshold=${value_available_spare_threshold} data_units_written=${value_data_units_written} data_units_read=${value_data_units_read}"
 
 if [ "$percent_available_spare" -le "$percent_available_spare_threshold"  ]; then
   echo "CRITICAL: disk ${DISK} runs out of spare capacity: ${PERFDATA}"
