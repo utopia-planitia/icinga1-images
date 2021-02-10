@@ -108,11 +108,11 @@ fi
 
 USED=$( $EXEC ceph df | head -n 3 | tail -n 1 | awk '{print $10}')
 if (( $(echo "$USED > $DF_CRIT" | bc -l) )); then
-        echo "[ERR] $FREE% is space is used"
+        echo "[ERR] $USED% is space is used"
         exit $STATE_CRITICAL
 fi
 if (( $(echo "$USED > $DF_WARN" | bc -l) )); then
-        echo "[WARN] $FREE% is space is used"
+        echo "[WARN] $USED% is space is used"
         exit $STATE_WARNING
 fi
 
