@@ -46,3 +46,4 @@ COPY plugins/check_pods.cfg            /etc/nagios-plugins/config/
 COPY plugins/check_ssl_certificate     /usr/lib/nagios/plugins/
 COPY plugins/check_ssl_certificate.cfg /etc/nagios-plugins/config/
 COPY plugins/check_ceph                /usr/lib/nagios/plugins/
+COPY plugins/check_rook                /usr/lib/nagios/plugins/

@@ -1,0 +1,74 @@
+#! /bin/bash
+
+#########THIS part is for Nagios ################################
+PROGNAME=`/usr/bin/basename $0`
+PROGPATH=`echo $0 | sed -e 's,[\\/][^\\/][^\\/]*$,,'`
+REVISION=`echo '$Revision: 1749 $' | sed -e 's/[^0-9.]//g'`
+. $PROGPATH/utils.sh
+
+#####################################################################
+
+#Function to print Usage
+function usage
+{
+echo "Usage: $0 -s [apiserver endpoint] -r [not bound warning] -R [not bound critical]"
+exit $STATE_UNKNOWN
+}
+
+UNBOUND_PVCS_WARN=1
+UNBOUND_PVCS_CRIT=2
+
+APISERVER=https://kubernetes.default.svc
+#####################################################################
+# get parameter values in Variables
+
+while test -n "$1"; do
+    case "$1" in
+         -h)
+            usage
+            ;;
+         -r)
+            UNBOUND_PVCS_WARN=$2
+            shift
+            ;;
+         -R)
+            UNBOUND_PVCS_CRIT=$2
+            shift
+            ;;
+         *)
+            echo "Unknown argument: $1"
+            usage
+            ;;
+    esac
+    shift
+done
+
+#####################################################################
+
+set -euo pipefail
+
+OLD=$( tempfile )
+NEW=$( tempfile )
+
+curl --silent --fail 'http://metrics-prometheus-operato-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${OLD}
+curl --silent --fail 'http://metrics-prometheus-operato-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${NEW}
+
+UNBOUND_PVCS=$( cat ${OLD} ${NEW} | sort | uniq -c | awk '{ if ($1 >= 2) print $2 }' )
+UNBOUND_PVCS_COUNT=$( echo -n "" | wc -l )
+if [ -n "$UNBOUND_PVCS" ]; then
+    UNBOUND_PVCS_COUNT=$( echo "$UNBOUND_PVCS" | wc -l )
+fi
+
+rm ${OLD} ${NEW}
+
+if [ "$UNBOUND_PVCS_COUNT" -ge "$UNBOUND_PVCS_CRIT" ]; then
+        echo "[CRIT] $UNBOUND_PVCS_COUNT pvs are not bounding: $UNBOUND_PVCS"
+        exit $STATE_CRITICAL
+fi
+if [ "$UNBOUND_PVCS_COUNT" -ge "$UNBOUND_PVCS_WARN" ]; then
+        echo "[WARN] $UNBOUND_PVCS_COUNT pvs are not bounding: $UNBOUND_PVCS"
+        exit $STATE_WARNING
+fi
+
+echo "[OK] all pvs look healthy"
+exit $STATE_OK
