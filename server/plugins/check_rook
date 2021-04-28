@@ -50,8 +50,8 @@ set -euo pipefail
 OLD=$( tempfile )
 NEW=$( tempfile )
 
-curl --silent --fail 'http://metrics-prometheus-operato-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${OLD}
-curl --silent --fail 'http://metrics-prometheus-operato-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${NEW}
+curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${OLD}
+curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_persistentvolumeclaim_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Lost"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.persistentvolumeclaim)"' > ${NEW}
 
 UNBOUND_PVCS=$( cat ${OLD} ${NEW} | sort | uniq -c | awk '{ if ($1 >= 2) print $2 }' )
 UNBOUND_PVCS_COUNT=$( echo -n "" | wc -l )
