@@ -10,6 +10,8 @@ RUN apt-get update && \
         gcc python-dev python-pip smartmontools \
         sudo \
         lm-sensors \
+        iproute2 \
+        gettext-base \
         && \
     rm -rf /var/lib/apt/lists/*
 
@@ -36,3 +38,6 @@ RUN sed -i 's/# command_prefix=\/usr\/bin\/sudo/command_prefix=\/usr\/bin\/sudo/
 CMD ["/usr/sbin/nrpe", "-c", "/etc/nagios/nrpe.cfg", "-f"]
 
 COPY nrpe_local.cfg /etc/nagios/nrpe_local.cfg
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
