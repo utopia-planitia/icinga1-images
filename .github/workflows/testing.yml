@@ -2,8 +2,8 @@ name: Test build Docker image
 
 on:
   push:
-    branches:
-      - '!main'
+    branches-ignore:
+      - main
 
 env:
   REGISTRY: ghcr.io
