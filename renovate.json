@@ -1,5 +1,12 @@
 {
   "extends": [
-    "config:base"
-  ]
+      "config:base"
+  ],
+  "pinDigests": true,
+  "prHourlyLimit": 0,
+  "labels": [
+      "renovate-bot"
+  ],
+  "automerge": true,
+  "automergeType": "pr"
 }
