@@ -64,8 +64,8 @@ set -euo pipefail
 OLD=$( tempfile )
 NEW=$( tempfile )
 
-curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Terminating"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${OLD}
-curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~".*ci.*",phase=~"Pending|Unknown|Terminating"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${NEW}
+curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~"ci-.*|.*-ci-.*|.*ci|lab-.*|.*-lab-.*|.*lab",phase=~"Pending|Unknown|Terminating"\}%20offset%205m%20>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${OLD}
+curl --silent --fail 'http://kube-prometheus-stack-prometheus.monitoring.svc:9090/api/v1/query?query=kube_pod_status_phase\{job="kube-state-metrics",namespace!~"ci-.*|.*-ci-.*|.*ci|lab-.*|.*-lab-.*|.*lab",phase=~"Pending|Unknown|Terminating"\}>0' | jq -M -r '.data.result[].metric | "\(.namespace)/\(.pod)"' > ${NEW}
 
 NOT_RUNNING_PODS=$( cat ${OLD} ${NEW} | sort | uniq -c | awk '{ if ($1 >= 2) print $2 }' )
 NOT_RUNNING_PODS_COUNT=$( echo -n "" | wc -l )
