@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
-RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.17.2/bin/linux/amd64/kubectl && \
+RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.25.0/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 EXPOSE 80
@@ -47,3 +47,4 @@ COPY plugins/check_ssl_certificate     /usr/lib/nagios/plugins/
 COPY plugins/check_ssl_certificate.cfg /etc/nagios-plugins/config/
 COPY plugins/check_ceph                /usr/lib/nagios/plugins/
 COPY plugins/check_rook                /usr/lib/nagios/plugins/
+COPY plugins/check_kvm_allocatable     /usr/lib/nagios/plugins/
