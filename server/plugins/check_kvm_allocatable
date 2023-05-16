@@ -16,6 +16,7 @@ exit $STATE_UNKNOWN
 }
 
 APISERVER=https://kubernetes.default.svc
+NODE_NAME=""
 #####################################################################
 # get parameter values in Variables
 
@@ -28,6 +29,10 @@ while test -n "$1"; do
             APISERVER=$2
             shift
             ;;
+         -n)
+            NODE_NAME=$2
+            shift
+            ;;
          *)
             echo "Unknown argument: $1"
             usage
@@ -35,6 +40,11 @@ while test -n "$1"; do
     esac
     shift
 done
+
+if [ "$NODE_NAME" == "" ]; then
+        echo "[UNKNOWN] NODE_NAME (-n) is not set"
+        exit $STATE_UNKNOWN
+fi
 
 #####################################################################
 
@@ -45,21 +55,21 @@ TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
 # "devices.kubevirt.io/kvm":"1k"
-KVM=$( $KUBECTL kubectl get nodes scott01 -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/kvm']}" )
+KVM=$( $KUBECTL get nodes $NODE_NAME -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/kvm']}" )
 if [ "$KVM" != "1k" ]; then
         echo "[CRIT] $KVM kvms are avaiable"
         exit $STATE_CRITICAL
 fi
 
 # "devices.kubevirt.io/tun":"1k"
-TUN=$( $KUBECTL kubectl get nodes scott01 -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/tun']}" )
+TUN=$( $KUBECTL get nodes $NODE_NAME -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/tun']}" )
 if [ "$TUN" != "1k" ]; then
         echo "[CRIT] $TUN tun interfaces are avaiable"
         exit $STATE_CRITICAL
 fi
 
 # "devices.kubevirt.io/vhost-net":"1k"
-VHOST_NET=$( $KUBECTL kubectl get nodes scott01 -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/vhost-net']}" )
+VHOST_NET=$( $KUBECTL get nodes $NODE_NAME -o json -o=jsonpath="{.status.allocatable['devices\.kubevirt\.io/vhost-net']}" )
 if [ "$TUN" != "1k" ]; then
         echo "[CRIT] $VHOST_NET vhost-net interfaces are avaiable"
         exit $STATE_CRITICAL
