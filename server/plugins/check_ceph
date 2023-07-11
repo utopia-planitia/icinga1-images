@@ -67,7 +67,7 @@ if [ $? -ne 0 ]; then
         exit $STATE_UNKNOWN
 fi
 
-EXEC="$KUBECTL -n $NAMESPACE exec $POD"
+EXEC="$KUBECTL -n $NAMESPACE exec -- $POD"
 
 STATUS=$( $EXEC ceph status 2>&1 )
 if [ $? -ne 0 ]; then
