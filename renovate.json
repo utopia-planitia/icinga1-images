@@ -3,6 +3,7 @@
       "config:base",
       "regexManagers:dockerfileVersions"
   ],
+  "configMigration": true,
   "pinDigests": true,
   "prHourlyLimit": 0,
   "labels": [
