@@ -14,6 +14,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     gpasswd -a www-data nagios
 
+# renovate: datasource=github-releases depName=kubernetes/kubernetes
+ENV KUBERNETES_VERSION=v1.25.0
 RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.25.0/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
