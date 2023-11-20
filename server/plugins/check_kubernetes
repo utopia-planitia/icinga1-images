@@ -47,9 +47,9 @@ done
 TOKEN=$(cat /run/secrets/kubernetes.io/serviceaccount/token)
 KUBECTL="kubectl --server $APISERVER --token $TOKEN --certificate-authority=/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
-STATUS=$( $KUBECTL get cs --no-headers=true 2>&1 )
+STATUS=$( $KUBECTL get --raw='/readyz?verbose' 2>&1 )
 if [ $? -ne 0 ]; then
-        echo "[ERR] failed to connect to ceph: $STATUS"
+        echo "[ERR] failed to connect to the Kubernetes API health endpoints: $STATUS"
         exit $STATE_CRITICAL
 fi
 if [ "$STATUS" == "" ]; then
@@ -57,19 +57,14 @@ if [ "$STATUS" == "" ]; then
         exit $STATE_UNKNOWN
 fi
 
-HEALTH=$(      echo "$STATUS" | grep etcd-0             | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] etcd-0 is not healthy"
+HEALTH=$(      echo "$STATUS" | grep -E '\betcd '           | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "ok" ]; then
+	echo "[CRIT] etcd is not healthy"
 	exit $STATE_CRITICAL
 fi
-HEALTH=$(      echo "$STATUS" | grep etcd-1             | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] etcd-1 is not healthy"
-	exit $STATE_CRITICAL
-fi
-HEALTH=$(      echo "$STATUS" | grep etcd-2             | awk -F ' ' '{print $2}' )
-if [ "$HEALTH" != "Healthy" ]; then
-	echo "[CRIT] etcd-2 is not healthy"
+HEALTH=$(      echo "$STATUS" | grep -E '\betcd-readiness ' | awk -F ' ' '{print $2}' )
+if [ "$HEALTH" != "ok" ]; then
+	echo "[CRIT] etcd-readiness is not healthy"
 	exit $STATE_CRITICAL
 fi
 
