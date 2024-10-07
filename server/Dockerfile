@@ -1,4 +1,4 @@
-FROM ubuntu:18.04@sha256:152dc042452c496007f07ca9127571cb9c29697f42acbfad72324b2bb2e43c98
+FROM ubuntu:24.04@sha256:b359f1067efa76f37863778f7b6d0e8d911e3ee8efa807ad01fbf5dc1ef9006b
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update && \
