@@ -16,7 +16,7 @@ RUN apt-get update && \
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
 ENV KUBERNETES_VERSION=v1.33.2
-RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/v1.25.0/bin/linux/amd64/kubectl && \
+RUN curl -L -o /usr/local/bin/kubectl --fail https://storage.googleapis.com/kubernetes-release/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
 EXPOSE 80
