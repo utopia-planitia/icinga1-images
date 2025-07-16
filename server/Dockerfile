@@ -15,7 +15,7 @@ RUN apt-get update && \
     gpasswd -a www-data nagios
 
 # renovate: datasource=github-releases depName=kubernetes/kubernetes
-ENV KUBERNETES_VERSION=v1.33.2
+ENV KUBERNETES_VERSION=v1.33.3
 RUN curl -L -o /usr/local/bin/kubectl --fail https://dl.k8s.io/release/${KUBERNETES_VERSION}/bin/linux/amd64/kubectl && \
     chmod +x /usr/local/bin/kubectl
 
